@@ -1,0 +1,26 @@
+{
+    # Jira Authentication Values
+    "jira_auth": {
+        "token": "",
+        "server": ""
+    },
+
+    # Database Authentication Values
+    "database_auth": {
+        "host": "",
+        "database": "",
+        "username": "",
+        "password": ""
+    },
+
+    # Gather Jira Rules
+    "gather_jira": {
+        "team_name": "",
+        "rules": [
+            {"classification": "blocker", "query": ""},
+            {"classification": "critical blocker", "query": ""},
+            {"classification": "escaped bug", "query": ""}
+        ],
+        "data_retention_days": 90
+    }
+}

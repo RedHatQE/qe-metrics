@@ -1,7 +1,8 @@
-FROM docker.io/library/python:3.12-slim
+FROM docker.io/library/python:3.11-slim
 
 COPY pyproject.toml poetry.lock /qe-metrics/
 COPY cli /qe-metrics/cli/
+COPY README.md /qe-metrics/
 COPY --chmod=0755 development /development/
 
 WORKDIR /qe-metrics
@@ -18,4 +19,4 @@ RUN python3 -m pip install pip poetry --upgrade \
 RUN printf '#!/bin/bash \n poetry run qe-metrics $@' > /usr/bin/qe-metrics \
     && chmod +x /usr/bin/qe-metrics
 
-ENTRYPOINT ["qe-metrics"]
+ENTRYPOINT qe-metrics

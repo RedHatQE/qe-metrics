@@ -1,5 +1,5 @@
 #!/bin/bash
 
-# Build Jira config
-echo "${JIRA_TOKEN}" > /tmp/token
-qe-metrics jira-config-gen --token-path /tmp/token --server-url "${JIRA_SERVER_URL}"
+qe-metrics init-db -l
+qe-metrics new-team -n cspi -e caevans@redhat.com -l
+qe-metrics gather-jira -l

@@ -14,22 +14,3 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-"""Module building qe-metrics cli"""
-import click
-
-from cli.commands.gather_jira import gather_jira
-from cli.commands.init_config import init_config
-from cli.commands.init_db import init_db
-from cli.commands.new_team import new_team
-
-
-@click.group()
-@click.pass_context
-def cli(ctx: click.Option) -> None:
-    pass
-
-
-cli.add_command(new_team)  # type: ignore
-cli.add_command(init_db)  # type: ignore
-cli.add_command(init_config)  # type: ignore
-cli.add_command(gather_jira)  # type: ignore
