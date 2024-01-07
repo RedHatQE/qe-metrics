@@ -51,7 +51,7 @@ class Config:
         self.logger = get_logger(__name__)
 
         # Define the filepath and load the configuration file
-        self.filepath = filepath
+        self.filepath = filepath or self._get_filepath()
         self.config_dict = self._load_config(filepath=self.filepath)
 
         # Establish a connection to Jira
@@ -78,7 +78,7 @@ class Config:
             config_dict=self.config_dict,
         )
 
-    def _load_config(self, filepath: Path | None) -> dict[Any, Any]:
+    def _load_config(self, filepath: Path) -> dict[Any, Any]:
         """
         Loads the configuration file
         Args:
@@ -86,10 +86,6 @@ class Config:
         Returns:
             dict: Configuration file as a dictionary
         """
-        # Get the filepath if not defined
-        if not filepath:
-            filepath = self._get_filepath()
-
         self.logger.info(f"Loading configuration file at {filepath}")
 
         # Read the contents of the config file
@@ -245,7 +241,7 @@ class Config:
             exit(1)
 
         # Exit if team_name is not found in database
-        if pny.select(t for t in Team if t.name == team_name).first() or not check_team:  # type: ignore
+        if not check_team or pny.select(t for t in Team if t.name == team_name).first():  # type: ignore
             return team_name
         else:
             self.logger.error(f'Team name "{team_name}" not found in database')
