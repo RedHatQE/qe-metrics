@@ -17,7 +17,9 @@
 import unittest
 
 import pytest
+
 from cli.obj.gather_jira_rule import GatherJiraRule
+
 
 class TestGatherJiraRule(unittest.TestCase):
     def setUp(self):
