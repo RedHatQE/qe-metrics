@@ -15,6 +15,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 from datetime import date
+from datetime import datetime
 
 from pony import orm as pny
 from simple_logger.logger import get_logger
@@ -113,6 +114,7 @@ class JiraIssue(connection.Entity):  # type: ignore
     """
 
     id = pny.PrimaryKey(int, auto=True)
+    date_added = pny.Required(datetime, default=datetime.now)
     team = pny.Required(Team)
     classification = pny.Required(str)
     issue_key = pny.Required(str)

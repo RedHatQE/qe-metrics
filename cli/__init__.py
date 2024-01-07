@@ -17,6 +17,7 @@
 """Module building qe-metrics cli"""
 import click
 
+from cli.commands.clean_db import clean_db
 from cli.commands.gather_jira import gather_jira
 from cli.commands.init_config import init_config
 from cli.commands.init_db import init_db
@@ -33,3 +34,4 @@ cli.add_command(new_team)  # type: ignore
 cli.add_command(init_db)  # type: ignore
 cli.add_command(init_config)  # type: ignore
 cli.add_command(gather_jira)  # type: ignore
+cli.add_command(clean_db)  # type: ignore
