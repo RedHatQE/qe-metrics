@@ -172,6 +172,8 @@ class Config:
         username = config_dict.get("database_auth", {}).get("username")
         password = config_dict.get("database_auth", {}).get("password")
         db_name = config_dict.get("database_auth", {}).get("database")
+        port = config_dict.get("database_auth", {}).get("port", 30327)
+        provider = config_dict.get("database_auth", {}).get("provider", "postgres")
 
         # Verify that the database connection information is present in the config file
         if not host or not username or not password or not db_name:
@@ -185,6 +187,8 @@ class Config:
             username=username,
             password=password,
             db_name=db_name,
+            port=port,
+            provider=provider,
             debug_mode=verbose,
             init_db=init_db,
             local_mode=local,

@@ -34,15 +34,18 @@ class CleanDatabase:
         self.logger = get_logger(__name__)
 
         # Delete issues older than the specified number of days
-        self.gather_jira_data_retention = config.gather_jira_data_retention
-        self.delete_jira_issues_older_than(days=self.gather_jira_data_retention)
+        self.delete_jira_issues_older_than(
+            days=config.gather_jira_data_retention,
+            team_name=config.gather_jira_team,
+        )
 
     @pny.db_session
-    def delete_jira_issues_older_than(self, days: int) -> None:
+    def delete_jira_issues_older_than(self, days: int, team_name: str) -> None:
         """
         Delete JiraIssue records that are older than the specified number of days.
         Args:
             days(int): The number of days
+            team_name(str): The name of the team associated with the JiraIssue records
         Returns:
             None
         """
@@ -50,6 +53,6 @@ class CleanDatabase:
         cutoff_date = datetime.now() - timedelta(days=days)
 
         try:
-            pny.delete(j for j in JiraIssue if j.date_added < cutoff_date)  # type: ignore
+            pny.delete(j for j in JiraIssue if j.date_added < cutoff_date and j.team == team_name)  # type: ignore
         except Exception as error:
             self.logger.error(f"Failed to delete JiraIssue records: {error}")

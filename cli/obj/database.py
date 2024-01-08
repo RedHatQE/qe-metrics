@@ -31,6 +31,7 @@ class Database:
         password: str,
         db_name: str,
         debug_mode: bool,
+        port: int = 30327,
         provider: str = "postgres",
         init_db: bool = False,
         local_mode: bool = False,
@@ -43,6 +44,7 @@ class Database:
             password(str): The password to use when connecting to the database
             db_name(str): The name of the database to connect to
             debug_mode(bool): Whether to enable debug mode
+            port(int): The port to use when connecting to the database
             provider(str): The database provider to use, defaults to postgres
             init_db(bool): Whether to initialize the database
             local_mode(bool): Whether to use a local SQLite database instead of a real database
@@ -61,25 +63,31 @@ class Database:
 
         # Create the connection to the database
         self.connection = connection
-
-        if local_mode:
-            # If set, use a local SQLite database instead of a real database
-            self.logger.info("Local mode enabled, using SQLite database")
-            self.connection.bind(
-                provider="sqlite",
-                filename="database.sqlite",
-                create_db=True,
-            )
-        else:
-            # Otherwise, use the actual database
-            self.logger.info("Local mode disabled, using actual database connection")
-            self.connection = self.connection.bind(
-                provider=provider,
-                host=host,
-                user=username,
-                password=password,
-                database=db_name,
-            )
+        try:
+            if local_mode:
+                # If set, use a local SQLite database instead of a real database
+                self.logger.info("Local mode enabled, using SQLite database")
+                self.connection.bind(
+                    provider="sqlite",
+                    filename="database.sqlite",
+                    create_db=True,
+                )
+            else:
+                # Otherwise, use the actual database
+                self.logger.info(
+                    "Local mode disabled, using actual database connection",
+                )
+                self.connection.bind(
+                    provider=provider,
+                    host=host,
+                    user=username,
+                    password=password,
+                    database=db_name,
+                    port=port,
+                )
+        except Exception as error:
+            self.logger.error(f"Failed to bind database connection: {error}")
+            raise
 
         if init_db:
             # Initialize the database, if requested.

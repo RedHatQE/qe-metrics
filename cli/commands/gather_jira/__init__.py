@@ -19,6 +19,7 @@ from pathlib import Path
 
 import click
 
+from cli.commands.clean_db import CleanDatabase
 from cli.commands.common_options import config_option
 from cli.commands.common_options import local_option
 from cli.commands.common_options import verbose_option
@@ -29,8 +30,15 @@ from cli.obj.config import Config
 @verbose_option
 @local_option
 @config_option
+@click.option(
+    "--clean-db",
+    is_flag=True,
+    default=False,
+    help="If set, the tool will remove any items in the JiraIssue table that are older than the value of \"data_retention_days\" in the configuration file. This is the same functionality as running \"qe-metrics clean-db\".",
+    type=click.BOOL,
+)
 @click.command("gather-jira")
-def gather_jira(verbose: bool, local: bool, config: str) -> None:
+def gather_jira(verbose: bool, local: bool, config: str, clean_db: bool) -> None:
     """
     Gathers Jira data and saves it to the database.
     """
@@ -40,3 +48,6 @@ def gather_jira(verbose: bool, local: bool, config: str) -> None:
         verbose=verbose,
     )
     GatherJira(config=config_obj)
+
+    if clean_db:
+        CleanDatabase(config=config_obj)
