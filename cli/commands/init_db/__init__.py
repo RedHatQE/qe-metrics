@@ -32,12 +32,6 @@ from cli.obj.config import Config
 def init_db(verbose: bool, local: bool, config: str) -> None:
     """
     Used to initialize the database.
-    Args:
-        verbose(bool): Output all interactions with database
-        local(bool): Use a local SQLite database
-        config(str): Path to the configuration file
-    Returns:
-        None
     """
     Config(
         filepath=Path(config) if config else None,

@@ -34,7 +34,7 @@ from cli.obj.config import Config
     "--clean-db",
     is_flag=True,
     default=False,
-    help="If set, the tool will remove any items in the JiraIssue table that are older than the value of \"data_retention_days\" in the configuration file. This is the same functionality as running \"qe-metrics clean-db\".",
+    help='If set, the tool will remove any items in the JiraIssue table that are older than the value of "data_retention_days" in the configuration file. This is the same functionality as running "qe-metrics clean-db".',
     type=click.BOOL,
 )
 @click.command("gather-jira")
