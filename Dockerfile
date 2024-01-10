@@ -14,7 +14,9 @@ RUN python3 -m pip install pip poetry --upgrade \
     && poetry config cache-dir /qe-metrics \
     && poetry config virtualenvs.in-project true \
     && poetry config installer.max-workers 10 \
-    && poetry install
+    && poetry install \
+    && apt update \
+    && apt install -y --no-install-recommends vim nano
 
 RUN printf '#!/bin/bash \n poetry run qe-metrics $@' > /usr/bin/qe-metrics \
     && chmod +x /usr/bin/qe-metrics
