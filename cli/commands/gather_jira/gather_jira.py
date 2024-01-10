@@ -87,6 +87,11 @@ class GatherJira:
 
             for issue in issues:
                 team = Team.get(name=self.gather_jira_team)
+
+                # Check if issue already exists in database for a given team. If it does, skip it
+                if JiraIssue.exists(issue_key=issue.key, team=team):
+                    continue
+
                 JiraIssue(
                     team=team,
                     classification=rule.classification,
