@@ -35,10 +35,6 @@ repos:
   - id: mypy
     exclude: ^(tests/)
     additional_dependencies: [types-all]
-- repo: https://github.com/psf/black
-  rev: 23.11.0
-  hooks:
-  - id: black
 - repo: https://github.com/PyCQA/flake8
   rev: "6.1.0"
   hooks:
@@ -59,3 +55,8 @@ repos:
   rev: v1.4.0
   hooks:
     - id: detect-secrets
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.1.5
+  hooks:
+    - id: ruff
+    - id: ruff-format
