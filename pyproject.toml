@@ -47,7 +47,7 @@ ipython = "*"
 ipdb = "*"
 
 [tool.poetry.scripts]
-qe-metrics = "cli:cli"
+qe-metrics = "qe_metrics:qe_metrics"
 
 [build-system]
 requires = ["poetry-core"]
