@@ -1,4 +1,5 @@
-IMAGE_BUILD_CMD=$(shell which podman 2>/dev/null || which docker)
+CONTAINER_CMD=$(shell which podman 2>/dev/null || which docker)
+TAG ?= latest
 
 pre-commit:
 	pre-commit run --all-files
@@ -9,13 +10,16 @@ test:
 commit: pre-commit test
 
 container-build:
-	$(IMAGE_BUILD_CMD) build -t qe-metrics .
+	$(CONTAINER_CMD) build -t qe-metrics:$(TAG) .
+
+container-push:
+	$(CONTAINER_CMD) push quay.io/redhatqe/qe-metrics:$(TAG)
 
 container-test:
-	$(IMAGE_BUILD_CMD) run -it --env-file development/env.list --entrypoint /bin/bash qe-metrics /development/test.sh
+	$(CONTAINER_CMD) run -it --env-file development/env.list --entrypoint /bin/bash qe-metrics:$(TAG) /development/test.sh
 
 container-run:
-	$(IMAGE_BUILD_CMD) run -it --env-file development/env.list --entrypoint /bin/bash qe-metrics
+	$(CONTAINER_CMD) run -it --env-file development/env.list --entrypoint /bin/bash qe-metrics:$(TAG)
 
 container-build-run: container-build container-run
 
