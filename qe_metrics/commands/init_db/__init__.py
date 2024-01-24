@@ -14,16 +14,29 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-"""Module building qe_metrics cli"""
+"""Module building the init-db cli command"""
+from pathlib import Path
+
 import click
 
-from qe_metrics.commands.init_db import init_db
+from qe_metrics.commands.common_options import config_option
+from qe_metrics.commands.common_options import local_option
+from qe_metrics.commands.common_options import verbose_option
+from qe_metrics.obj.config import Config
 
 
-@click.group()
-@click.pass_context
-def cli(ctx: click.Option) -> None:
-    pass
-
-
-cli.add_command(init_db)  # type: ignore
+@verbose_option
+@local_option
+@config_option
+@click.command("init-db")
+def init_db(verbose: bool, local: bool, config: str) -> None:
+    """
+    Used to initialize the database.
+    """
+    Config(
+        filepath=Path(config) if config else None,
+        local=local,
+        verbose=verbose,
+        init_db=True,
+        check_team=False,
+    )
