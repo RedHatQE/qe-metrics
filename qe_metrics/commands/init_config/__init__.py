@@ -15,6 +15,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 """Module building the init-config cli command"""
+
 from pathlib import Path
 
 import click
