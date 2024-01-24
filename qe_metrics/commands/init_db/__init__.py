@@ -39,5 +39,4 @@ def init_db(verbose: bool, local: bool, config: str) -> None:
         local=local,
         verbose=verbose,
         init_db=True,
-        check_team=False,
     )
