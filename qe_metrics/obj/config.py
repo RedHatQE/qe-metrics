@@ -137,7 +137,7 @@ class Config:
         if not host or not username or not password or not db_name:
             self.logger.error(
                 'Database connection information not complete in config. Please validate the "database_auth" '
-                'section of the config file.',
+                "section of the config file.",
             )
             exit(1)
 

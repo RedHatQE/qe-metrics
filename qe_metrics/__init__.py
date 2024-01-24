@@ -15,6 +15,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 """Module building qe_metrics cli"""
+
 import click
 
 from qe_metrics.commands.init_db import init_db
