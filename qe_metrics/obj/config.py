@@ -31,7 +31,6 @@ class Config:
         local: bool = False,
         verbose: bool = False,
         init_db: bool = False,
-        check_team: bool = True,
     ) -> None:
         """
         Builds the Config object
@@ -40,7 +39,6 @@ class Config:
             local (bool, optional): Whether to run in local mode. Defaults to False.
             verbose (bool, optional): Whether to run in verbose mode. Defaults to False.
             init_db (bool, optional): Whether to initialize the database. Defaults to False.
-            check_team (bool, optional): Whether to check that the team exists in the database. Defaults to True.
         Returns:
             None
         """
