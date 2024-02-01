@@ -10,7 +10,7 @@ test:
 commit: pre-commit test
 
 container-build:
-	$(CONTAINER_CMD) build -t quay.io/redhatqe/qe-metrics:$(TAG) .
+	$(CONTAINER_CMD) build -f container/Dockerfile -t quay.io/redhatqe/qe-metrics:$(TAG) .
 
 container-push:
 	$(CONTAINER_CMD) push quay.io/redhatqe/qe-metrics:$(TAG)
