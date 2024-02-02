@@ -9,16 +9,16 @@ no_implicit_optional = "true"
 name = "qe-metrics"
 version = "1.0.0"
 description = "Report QE metrics"
-authors = ["Red Hat QE Community"]
+authors = ["Caleb Evans <caevans@redhat.com>"]
 readme = "README.md"
 license = "Apche-2.0"
 homepage = "https://github.com/RedHatQE/qe-metrics"
 repository = "https://github.com/RedHatQE/qe-metrics"
 packages = [{include = "qe_metrics"}]
+include = [{path = "manifests/*"}]
 classifiers = [
-    "License :: OSI Approved :: Apache v2.0 License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3 :: Only",
+    "Operating System :: OS Independent",
 ]
 
 [tool.poetry.urls]
@@ -44,7 +44,7 @@ ipython = "*"
 ipdb = "*"
 
 [tool.poetry.scripts]
-qe-metrics = "qe_metrics:qe_metrics"
+qe-metrics = "app.cli:main"
 
 [build-system]
 requires = ["poetry-core"]
