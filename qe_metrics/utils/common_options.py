@@ -10,6 +10,7 @@ def verbose_option(function: Callable[..., Any]) -> Callable[..., Any]:
         "--verbose",
         "-v",
         is_flag=True,
+        default=False,
         help="Verbose output of database connection.",
         type=click.BOOL,
     )(function)
@@ -18,9 +19,10 @@ def verbose_option(function: Callable[..., Any]) -> Callable[..., Any]:
 
 def local_option(function: Callable[..., Any]) -> Callable[..., Any]:
     function = click.option(
-        "--local-db",
+        "--local",
         "-l",
         is_flag=True,
+        default=False,
         help="Use a local SQLite database instead of a real database.",
         type=click.BOOL,
     )(function)
@@ -31,12 +33,11 @@ def config_option(function: Callable[..., Any]) -> Callable[..., Any]:
     function = click.option(
         "--config",
         "-c",
-        default=os.environ.get("QE_METRICS_CONFIG"),
+        default=os.environ.get("QE_METRICS_CONFIG", ""),
         help="Defines the path to the config file.",
         type=click.Path(exists=True),
     )(function)
     return function
-
 
 def pdb_option(function: Callable[..., Any]) -> Callable[..., Any]:
     function = click.option(

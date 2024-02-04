@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 from typing import Any
 
@@ -11,7 +12,7 @@ class Config:
     def __init__(
         self,
         filepath: Path | None = None,
-        local_db: bool = False,
+        local: bool = False,
         verbose: bool = False,
         init_db: bool = False,
     ) -> None:
@@ -19,7 +20,7 @@ class Config:
         Builds the Config object
         Args:
             filepath (Path, optional): Path to the configuration file. Defaults to None.
-            local_db (bool, optional): Whether to run in local mode. Defaults to False.
+            local (bool, optional): Whether to run in local mode. Defaults to False.
             verbose (bool, optional): Whether to run in verbose mode. Defaults to False.
             init_db (bool, optional): Whether to initialize the database. Defaults to False.
         Returns:
@@ -28,13 +29,13 @@ class Config:
         self.logger = get_logger(__name__)
 
         # Define the filepath and load the configuration file
-        self.filepath = filepath or Path("./qe-metrics.config")
+        self.filepath = filepath or self._get_filepath()
         self.config_dict = self.load_config(filepath=self.filepath)
 
         # Establish a connection to the database
-        self.database = self.get_database(
+        self.database = self._get_database(
             config_dict=self.config_dict,
-            local_db=local_db,
+            local=local,
             verbose=verbose,
             init_db=init_db,
         )
@@ -71,10 +72,29 @@ class Config:
 
         return config_dict
 
+    def get_filepath(self) -> Path:
+        """
+        Returns the filepath to the configuration file
+        Returns:
+            Path: Path to the configuration file
+        """
+        filepath = Path(
+            os.getenv("QE_METRICS_CONFIG")  # type: ignore
+            if os.getenv("QE_METRICS_CONFIG")
+            else "./qe-metrics.config",
+        )
+        if not filepath.exists():
+            self.logger.error(
+                "No configuration file specified or config not found. Please specify a configuration file using the "
+                "--config option or setting the $QE_METRICS_CONFIG environment variable.",
+            )
+            exit(1)
+        return filepath
+
     def get_database(
         self,
         config_dict: dict[Any, Any],
-        local_db: bool,
+        local: bool,
         verbose: bool,
         init_db: bool,
     ) -> Database:
@@ -82,7 +102,7 @@ class Config:
         Returns a Database object
         Args:
             config_dict (dict): Configuration file as a dictionary
-            local_db (bool): Whether to run in local mode
+            local (bool): Whether to run in local mode
             verbose (bool): Whether to run in verbose mode
             init_db (bool): Whether to initialize the database
         Returns:
@@ -112,5 +132,5 @@ class Config:
             provider=provider,
             debug_mode=verbose,
             init_db=init_db,
-            local_mode=local_db,
+            local_mode=local,
         )

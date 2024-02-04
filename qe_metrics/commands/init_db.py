@@ -1,7 +1,6 @@
 from pathlib import Path
 
 import click
-from click import Context
 
 from qe_metrics.utils.common_options import config_option
 from qe_metrics.utils.common_options import local_option
@@ -16,14 +15,14 @@ from qe_metrics.libs.config import Config
 @pdb_option
 @click.command("init-db")
 @click.pass_context
-def init_db(ctx: Context, verbose: bool, local_db: bool, config: str, pdb: bool) -> None:
+def init_db(ctx, verbose: bool, local: bool, config: str, pdb: bool) -> None:
     """
     Used to initialize the database.
     """
-    ctx.obj["PDB"] = pdb
+    ctx.obj['PDB'] = pdb
     Config(
         filepath=Path(config) if config else None,
-        local_db=local_db,
+        local=local,
         verbose=verbose,
         init_db=True,
     )
