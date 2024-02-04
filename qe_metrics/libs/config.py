@@ -1,19 +1,3 @@
-#
-# Copyright (C) 2024 Red Hat, Inc.
-#
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    You should have received a copy of the GNU General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
 import json
 import os
 from pathlib import Path
@@ -21,7 +5,7 @@ from typing import Any
 
 from simple_logger.logger import get_logger
 
-from qe_metrics.obj.database import Database
+from qe_metrics.libs.database import Database
 
 
 class Config:
@@ -46,7 +30,7 @@ class Config:
 
         # Define the filepath and load the configuration file
         self.filepath = filepath or self._get_filepath()
-        self.config_dict = self._load_config(filepath=self.filepath)
+        self.config_dict = self.load_config(filepath=self.filepath)
 
         # Establish a connection to the database
         self.database = self._get_database(
@@ -56,7 +40,7 @@ class Config:
             init_db=init_db,
         )
 
-    def _load_config(self, filepath: Path) -> dict[Any, Any]:
+    def load_config(self, filepath: Path) -> dict[Any, Any]:
         """
         Loads the configuration file
         Args:
@@ -88,7 +72,7 @@ class Config:
 
         return config_dict
 
-    def _get_filepath(self) -> Path:
+    def get_filepath(self) -> Path:
         """
         Returns the filepath to the configuration file
         Returns:
@@ -107,7 +91,7 @@ class Config:
             exit(1)
         return filepath
 
-    def _get_database(
+    def get_database(
         self,
         config_dict: dict[Any, Any],
         local: bool,
