@@ -31,7 +31,7 @@ def config_option(function: Callable[..., Any]) -> Callable[..., Any]:
     function = click.option(
         "--config",
         "-c",
-        default=os.environ.get("QE_METRICS_CONFIG", ""),
+        default=os.environ.get("QE_METRICS_CONFIG"),
         help="Defines the path to the config file.",
         type=click.Path(exists=True),
     )(function)
