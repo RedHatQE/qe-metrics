@@ -10,7 +10,6 @@ def verbose_option(function: Callable[..., Any]) -> Callable[..., Any]:
         "--verbose",
         "-v",
         is_flag=True,
-        default=False,
         help="Verbose output of database connection.",
         type=click.BOOL,
     )(function)
@@ -22,7 +21,6 @@ def local_option(function: Callable[..., Any]) -> Callable[..., Any]:
         "--local",
         "-l",
         is_flag=True,
-        default=False,
         help="Use a local SQLite database instead of a real database.",
         type=click.BOOL,
     )(function)
