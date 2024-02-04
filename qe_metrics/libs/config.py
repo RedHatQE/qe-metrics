@@ -29,11 +29,11 @@ class Config:
         self.logger = get_logger(__name__)
 
         # Define the filepath and load the configuration file
-        self.filepath = filepath or self._get_filepath()
+        self.filepath = filepath or "./qe-metrics.config"
         self.config_dict = self.load_config(filepath=self.filepath)
 
         # Establish a connection to the database
-        self.database = self._get_database(
+        self.database = self.get_database(
             config_dict=self.config_dict,
             local=local,
             verbose=verbose,
@@ -71,25 +71,6 @@ class Config:
             exit(1)
 
         return config_dict
-
-    def get_filepath(self) -> Path:
-        """
-        Returns the filepath to the configuration file
-        Returns:
-            Path: Path to the configuration file
-        """
-        filepath = Path(
-            os.getenv("QE_METRICS_CONFIG")  # type: ignore
-            if os.getenv("QE_METRICS_CONFIG")
-            else "./qe-metrics.config",
-        )
-        if not filepath.exists():
-            self.logger.error(
-                "No configuration file specified or config not found. Please specify a configuration file using the "
-                "--config option or setting the $QE_METRICS_CONFIG environment variable.",
-            )
-            exit(1)
-        return filepath
 
     def get_database(
         self,
