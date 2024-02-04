@@ -3,6 +3,8 @@ import datetime
 import time
 import sys
 
+from click import Context
+
 from qe_metrics.commands.init_db import init_db
 from simple_logger.logger import get_logger
 
@@ -14,9 +16,9 @@ from simple_logger.logger import get_logger
     is_flag=True,
 )
 @click.pass_context
-def main(ctx, pdb: bool) -> None:
+def main(ctx: Context, pdb: bool) -> None:
     ctx.ensure_object(dict)
-    ctx.obj['PDB'] = pdb
+    ctx.obj["PDB"] = pdb
 
 
 main.add_command(init_db)  # type: ignore
@@ -28,13 +30,13 @@ if __name__ == "__main__":
     _logger = get_logger(name="main-qe-metrics")
     ctx = main.make_context("cli", sys.argv[1:]) or None
     try:
-        main.invoke(ctx)
+        main.invoke(ctx)  # type: ignore
     except Exception as ex:
         import traceback
 
         ipdb = __import__("ipdb")  # Bypass debug-statements pre-commit hook
 
-        if ctx and ctx.obj is not None and ctx.obj['PDB']:
+        if ctx and ctx.obj is not None and ctx.obj["PDB"]:
             extype, value, tb = sys.exc_info()
             traceback.print_exc()
             ipdb.post_mortem(tb)

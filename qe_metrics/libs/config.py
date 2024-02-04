@@ -1,5 +1,4 @@
 import json
-import os
 from pathlib import Path
 from typing import Any
 
@@ -29,7 +28,7 @@ class Config:
         self.logger = get_logger(__name__)
 
         # Define the filepath and load the configuration file
-        self.filepath = filepath or "./qe-metrics.config"
+        self.filepath = filepath or Path("./qe-metrics.config")
         self.config_dict = self.load_config(filepath=self.filepath)
 
         # Establish a connection to the database

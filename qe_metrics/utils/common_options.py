@@ -39,6 +39,7 @@ def config_option(function: Callable[..., Any]) -> Callable[..., Any]:
     )(function)
     return function
 
+
 def pdb_option(function: Callable[..., Any]) -> Callable[..., Any]:
     function = click.option(
         "--pdb",
