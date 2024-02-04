@@ -18,7 +18,7 @@ def verbose_option(function: Callable[..., Any]) -> Callable[..., Any]:
 
 def local_option(function: Callable[..., Any]) -> Callable[..., Any]:
     function = click.option(
-        "--local",
+        "--local-db",
         "-l",
         is_flag=True,
         help="Use a local SQLite database instead of a real database.",

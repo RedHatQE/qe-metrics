@@ -11,7 +11,7 @@ class Config:
     def __init__(
         self,
         filepath: Path | None = None,
-        local: bool = False,
+        local_db: bool = False,
         verbose: bool = False,
         init_db: bool = False,
     ) -> None:
@@ -19,7 +19,7 @@ class Config:
         Builds the Config object
         Args:
             filepath (Path, optional): Path to the configuration file. Defaults to None.
-            local (bool, optional): Whether to run in local mode. Defaults to False.
+            local_db (bool, optional): Whether to run in local mode. Defaults to False.
             verbose (bool, optional): Whether to run in verbose mode. Defaults to False.
             init_db (bool, optional): Whether to initialize the database. Defaults to False.
         Returns:
@@ -34,7 +34,7 @@ class Config:
         # Establish a connection to the database
         self.database = self.get_database(
             config_dict=self.config_dict,
-            local=local,
+            local_db=local_db,
             verbose=verbose,
             init_db=init_db,
         )
@@ -74,7 +74,7 @@ class Config:
     def get_database(
         self,
         config_dict: dict[Any, Any],
-        local: bool,
+        local_db: bool,
         verbose: bool,
         init_db: bool,
     ) -> Database:
@@ -82,7 +82,7 @@ class Config:
         Returns a Database object
         Args:
             config_dict (dict): Configuration file as a dictionary
-            local (bool): Whether to run in local mode
+            local_db (bool): Whether to run in local mode
             verbose (bool): Whether to run in verbose mode
             init_db (bool): Whether to initialize the database
         Returns:
@@ -112,5 +112,5 @@ class Config:
             provider=provider,
             debug_mode=verbose,
             init_db=init_db,
-            local_mode=local,
+            local_mode=local_db,
         )
