@@ -7,14 +7,11 @@ from click import Context
 
 from qe_metrics.commands.init_db import init_db
 from simple_logger.logger import get_logger
+from qe_metrics.utils.common_options import pdb_option
 
 
 @click.group()
-@click.option(
-    "--pdb",
-    help="Drop to `ipdb` shell on exception",
-    is_flag=True,
-)
+@pdb_option
 @click.pass_context
 def main(ctx: Context, pdb: bool) -> None:
     ctx.ensure_object(dict)
