@@ -1,8 +1,6 @@
 FROM docker.io/library/python:3.11-slim
 
 COPY ../pyproject.toml poetry.lock /qe-metrics/
-COPY ../qe_metrics /qe-metrics/qe_metrics/
-COPY --chmod=0755 ../dev /dev/
 
 WORKDIR /qe-metrics
 
