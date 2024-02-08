@@ -2,8 +2,6 @@ import os
 from typing import Dict, Any
 
 import click
-import datetime
-import time
 
 from simple_logger.logger import get_logger
 
