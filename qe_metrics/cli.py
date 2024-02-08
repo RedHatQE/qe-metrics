@@ -8,21 +8,18 @@ import time
 from simple_logger.logger import get_logger
 
 from qe_metrics.libs.config import Config
-from qe_metrics.libs.user_input import UserInput
-from qe_metrics.utils.const import DEFAULT_CONFIG_FILE_PATH
 
 
 @click.group()
 @click.option(
     "--config",
     "-c",
-    default=os.environ.get("QE_METRICS_CONFIG") or DEFAULT_CONFIG_FILE_PATH,
+    default=os.environ.get("QE_METRICS_CONFIG") or "config.yaml",
     help="Defines the path to the config file.",
     type=click.Path(exists=True),
 )
 @click.option(
     "--local-db",
-    "-l",
     is_flag=True,
     help="Use a local SQLite database instead of a real database.",
     type=click.BOOL,
@@ -45,10 +42,8 @@ def main(**kwargs: Dict[str, Any]) -> None:
     # Remove the pdb option from the kwargs
     kwargs.pop("pdb", None)
 
-    user_input = UserInput(**kwargs)
-
     # Adding noqa: F841 to ignore the unused variable until next PR, otherwise pre-commit will fail
-    config = Config(config_file=user_input.config_path)  # noqa: F841
+    config = Config(config_file=str(kwargs.get("config")))  # noqa: F841
 
     # TODO: After getting database and Jira connection in config, use them to execute the queries here
     # TODO: Populate the database with the results of the queries
@@ -56,7 +51,6 @@ def main(**kwargs: Dict[str, Any]) -> None:
 
 
 if __name__ == "__main__":
-    start_time = time.time()
     should_raise = False
     _logger = get_logger(name="main-qe-metrics")
     try:
@@ -75,6 +69,5 @@ if __name__ == "__main__":
             _logger.error(ex)
             should_raise = True
     finally:
-        _logger.info(f"Total execution time: {datetime.timedelta(seconds=time.time() - start_time)}")
         if should_raise:
             sys.exit(1)
