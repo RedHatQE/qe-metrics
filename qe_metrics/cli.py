@@ -12,7 +12,7 @@ from qe_metrics.libs.config import Config
 @click.option(
     "--config",
     "-c",
-    default=os.environ.get("QE_METRICS_CONFIG") or "config.yaml",
+    default=os.environ.get("QE_METRICS_CONFIG", "config.yaml"),
     help="Defines the path to the config file.",
     type=click.Path(exists=True),
 )
@@ -41,7 +41,7 @@ def main(**kwargs: Dict[str, Any]) -> None:
     kwargs.pop("pdb", None)
 
     # Adding noqa: F841 to ignore the unused variable until next PR, otherwise pre-commit will fail
-    config = Config(config_file=str(kwargs.get("config")))  # noqa: F841
+    config = Config(config_file=str(kwargs["config"]))  # noqa: F841
 
     # TODO: After getting database and Jira connection in config, use them to execute the queries here
     # TODO: Populate the database with the results of the queries
