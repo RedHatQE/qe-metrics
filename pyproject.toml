@@ -33,6 +33,8 @@ python-simple-logger = "^1.0.8"
 psycopg2-binary = "^2.9.9"
 pony = "^0.7.17"
 pyaml-env = "^1.2.1"
+ipython = "*"
+ipdb = "*"
 
 [tool.poetry.group.dev.dependencies]
 tox = "^4.11.4"
@@ -40,8 +42,6 @@ pre-commit = "*"
 pytest = "^8.0.0"
 pytest-cov = "^4.1.0"
 pytest-mock = "^3.12.0"
-ipython = "*"
-ipdb = "*"
 
 [tool.poetry.scripts]
 qe-metrics = "qe_metrics.cli:main"
