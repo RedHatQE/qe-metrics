@@ -19,7 +19,7 @@ from qe_metrics.libs.config import Config
 @click.option(
     "--local-db",
     is_flag=True,
-    help="Use a local SQLite database instead of a real database.",
+    help="Use a local SQLite database instead of the DB in the config file.",
     type=click.BOOL,
 )
 @click.option(
