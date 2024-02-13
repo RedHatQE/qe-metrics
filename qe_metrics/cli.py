@@ -7,7 +7,6 @@ from simple_logger.logger import get_logger
 
 from qe_metrics.libs.database import Database
 from qe_metrics.libs.jira import Jira
-from qe_metrics.libs.service import Service
 
 
 @click.command()
