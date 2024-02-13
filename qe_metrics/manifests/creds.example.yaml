@@ -1,0 +1,10 @@
+database:
+    host:
+    port:
+    user:
+    password:
+    database:
+    local: false
+jira:
+  token:
+  server:
