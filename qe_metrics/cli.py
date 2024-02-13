@@ -5,22 +5,23 @@ import click
 
 from simple_logger.logger import get_logger
 
-from qe_metrics.libs.config import Config
+from qe_metrics.libs.database import Database
+from qe_metrics.libs.jira import Jira
+from qe_metrics.libs.service import Service
 
 
-@click.group()
+@click.command()
 @click.option(
-    "--config",
-    "-c",
-    default=os.environ.get("QE_METRICS_CONFIG", "config.yaml"),
-    help="Defines the path to the config file.",
+    "--services-file",
+    default=os.environ.get("QE_METRICS_SERVICES", "services.yaml"),
+    help="Defines the path to the services file.",
     type=click.Path(exists=True),
 )
 @click.option(
-    "--local-db",
-    is_flag=True,
-    help="Use a local SQLite database instead of the DB in the config file.",
-    type=click.BOOL,
+    "--creds-file",
+    default=os.environ.get("QE_METRICS_CREDS", "creds.yaml"),
+    help="Defines the path to the file holding database and Jira credentials.",
+    type=click.Path(exists=True),
 )
 @click.option(
     "--pdb",
@@ -29,7 +30,6 @@ from qe_metrics.libs.config import Config
 )
 @click.option(
     "--verbose",
-    "-v",
     is_flag=True,
     help="Verbose output of database connection.",
     type=click.BOOL,
@@ -41,10 +41,11 @@ def main(**kwargs: Dict[str, Any]) -> None:
     kwargs.pop("pdb", None)
 
     # Adding noqa: F841 to ignore the unused variable until next PR, otherwise pre-commit will fail
-    config = Config(config_file=str(kwargs["config"]))  # noqa: F841
+    database = Database(creds_file=str(kwargs["creds_file"]))  # noqa: F841
+    jira = Jira(creds_file=str(kwargs["creds_file"]))  # noqa: F841
+    services = Service.from_file(services_file=str(kwargs["services_file"]))  # noqa: F841
 
-    # TODO: After getting database and Jira connection in config, use them to execute the queries here
-    # TODO: Populate the database with the results of the queries
+    # TODO: For each service, execute their defined Jira queries and populate the database accordingly
     # TODO: Run a cleanup of the database to remove old entries
 
 
