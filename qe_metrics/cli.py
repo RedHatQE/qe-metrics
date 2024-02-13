@@ -43,7 +43,6 @@ def main(**kwargs: Dict[str, Any]) -> None:
     # Adding noqa: F841 to ignore the unused variable until next PR, otherwise pre-commit will fail
     database = Database(creds_file=str(kwargs["creds_file"]))  # noqa: F841
     jira = Jira(creds_file=str(kwargs["creds_file"]))  # noqa: F841
-    services = Service.from_file(services_file=str(kwargs["services_file"]))  # noqa: F841
 
     # TODO: For each service, execute their defined Jira queries and populate the database accordingly
     # TODO: Run a cleanup of the database to remove old entries
