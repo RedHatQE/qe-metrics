@@ -8,6 +8,7 @@ class QeMetricsBase(ABC):
     def __init__(self, creds_file: str) -> None:
         """
         Initialize the QeMetricsBase class
+
         Args:
             creds_file (str): Path to the yaml file holding database and Jira credentials.
         """
@@ -16,4 +17,4 @@ class QeMetricsBase(ABC):
         # Creds dict will hold credentials to Jira and the database (and any other future service)
         self.creds_dict = parse_config(creds_file)
 
-        # TODO: Define and validate configuration values from the config and creds files to be used in subclasses
+        # TODO: Define and validate configuration values from the creds files to be used in subclasses

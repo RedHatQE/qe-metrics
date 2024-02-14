@@ -5,6 +5,7 @@ class Database(QeMetricsBase):
     def __init__(self, creds_file: str) -> None:
         """
         Initialize the Database class
+
         Args:
             creds_file (str): Path to the yaml file holding database and Jira credentials.
 
