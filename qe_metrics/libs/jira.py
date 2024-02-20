@@ -1,7 +1,8 @@
-from qe_metrics.libs.qe_metrics_base import QeMetricsBase
+from pyaml_env import parse_config
+from simple_logger.logger import get_logger
 
 
-class Jira(QeMetricsBase):
+class Jira:
     def __init__(self, creds_file: str) -> None:
         """
         Initialize the Jira class
@@ -9,7 +10,9 @@ class Jira(QeMetricsBase):
         Args:
             creds_file (str): Path to the yaml file holding database and Jira credentials.
         """
-        super().__init__(creds_file=creds_file)
+        self.logger = get_logger(name=self.__class__.__module__)
+
+        self.creds_dict = parse_config(creds_file)
 
         # TODO: Add Jira connection using config
 
