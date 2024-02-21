@@ -12,7 +12,7 @@ class Jira:
         """
         self.logger = get_logger(name=self.__class__.__module__)
 
-        self.creds_dict = parse_config(creds_file)
+        self.jira_creds = parse_config(creds_file)["jira"]
 
         # TODO: Add Jira connection using config
 
