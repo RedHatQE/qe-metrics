@@ -1,12 +1,10 @@
 import os
 import sys
-from typing import Dict, Any
 
 import click
 from click import Context
 
 from simple_logger.logger import get_logger
-from pyaml_env import parse_config
 
 from qe_metrics.libs.database import Database
 from qe_metrics.libs.jira import Jira
