@@ -1,3 +1,15 @@
+[tool.coverage.run]
+omit = ["tests/*"]
+source = ["qe_metrics"]
+
+[tool.coverage.report]
+fail_under = 60
+skip_empty = true
+
+[tool.coverage.html]
+directory = "_tests_coverage"
+show_contexts = true
+
 [tool.mypy]
 check_untyped_defs = "true"
 disallow_any_generics = "true"
