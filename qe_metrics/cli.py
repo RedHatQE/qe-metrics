@@ -2,7 +2,6 @@ import os
 import sys
 
 import click
-from click import Context
 
 from simple_logger.logger import get_logger
 
@@ -34,12 +33,8 @@ from qe_metrics.libs.jira import Jira
     help="Verbose output of database connection.",
     type=click.BOOL,
 )
-@click.pass_context
-def main(ctx: Context, services_file: str, creds_file: str, pdb: bool, verbose_db: bool) -> None:
+def main(services_file: str, creds_file: str, pdb: bool, verbose_db: bool) -> None:
     """Gather QE Metrics"""
-    # Add pdb value to context
-    ctx.ensure_object(dict)
-    ctx.obj["PDB"] = pdb
 
     # Adding noqa: F841 to ignore the unused variable until next PR, otherwise pre-commit will fail
     database = Database(creds_file=creds_file)  # noqa: F841
@@ -51,22 +46,23 @@ def main(ctx: Context, services_file: str, creds_file: str, pdb: bool, verbose_d
 
 if __name__ == "__main__":
     should_raise = False
-    ctx = main.make_context("cli", sys.argv[1:]) or None
     _logger = get_logger(name="main-qe-metrics")
     try:
-        main.invoke(ctx)  # type: ignore
+        main()
     except Exception as ex:
+        import sys
         import traceback
 
         ipdb = __import__("ipdb")  # Bypass debug-statements pre-commit hook
 
-        if ctx and ctx.obj is not None and ctx.obj["PDB"]:
+        if "--pdb" in sys.argv:
             extype, value, tb = sys.exc_info()
             traceback.print_exc()
             ipdb.post_mortem(tb)
         else:
             _logger.error(ex)
             should_raise = True
+
     finally:
         if should_raise:
             sys.exit(1)
