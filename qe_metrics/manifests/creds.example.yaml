@@ -1,0 +1,10 @@
+database:
+    host: <FQDN or IP of the database server>
+    port: <Database service port number>
+    user: <Username used to connect to database>
+    password: <Password used to connect to database>
+    database: <Name of the Database>
+    local: <A boolean value. If "true", a local SQLite database. If "false", the creds above are used>
+jira:
+  token: <Jira API token>
+  server: <FQDN or IP of the Jira server>
