@@ -11,3 +11,4 @@ ignore:
  - ".github/in-solidarity.yml"  # default
  - ".github/workflows/*.yml"
  - "**/*.yml"
+ - "tests/unittests/utils.py"
