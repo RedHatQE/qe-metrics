@@ -4,7 +4,6 @@ import sys
 import click
 
 from simple_logger.logger import get_logger
-
 from qe_metrics.libs.database import Database
 from qe_metrics.libs.jira import Jira
 
@@ -37,7 +36,7 @@ def main(services_file: str, creds_file: str, pdb: bool, verbose_db: bool) -> No
     """Gather QE Metrics"""
 
     # Adding noqa: F841 to ignore the unused variable until next PR, otherwise pre-commit will fail
-    database = Database(creds_file=creds_file)  # noqa: F841
+    database = Database(creds_file=creds_file, verbose=verbose_db)  # noqa: F841
     jira = Jira(creds_file=creds_file)  # noqa: F841
 
     # TODO: For each service, execute their defined Jira queries and populate the database accordingly
