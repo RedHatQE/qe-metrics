@@ -1,34 +1,36 @@
-from pony import orm as pny
-from qe_metrics.libs.database import JiraIssues, Services
-from tests.unittests.utils import sqlite_table_exists, TEMP_DB_FILE
+import pytest
+from pony import orm
 
 
-def test_database_initialization(setup_teardown_sqlite_db):
-    assert sqlite_table_exists(db_file=TEMP_DB_FILE, table_name="Services")
-    assert sqlite_table_exists(db_file=TEMP_DB_FILE, table_name="JiraIssues")
+@pytest.fixture
+def fake_jira_issue():
+    return {
+        "issue_key": "TEST-1234",
+        "title": "Test Issue",
+        "url": "https://jira.com",
+        "project": "TEST",
+        "severity": "blocker",
+        "status": "Open",
+        "customer_escaped": False,
+        "date_created": "2024-01-01",
+        "last_updated": "2024-01-01",
+    }
 
 
-@pny.db_session
-def test_database_services_entry(setup_teardown_sqlite_db):
-    service = Services(name="test-service-entry-service")
-    all_services = Services.select()
-    assert service.name in [s.name for s in all_services]
+@pytest.mark.usefixtures("temp_sqlite_db")
+@orm.db_session
+def test_database_services_entry(temp_sqlite_db):
+    test_service = temp_sqlite_db.Services(name="test-service-entry-service")
+    all_services = temp_sqlite_db.Services.select()
+    assert test_service.name in [service.name for service in all_services], "Test service not found in database."
 
 
-@pny.db_session
-def test_database_jira_issues_entry(setup_teardown_sqlite_db):
-    service = Services(name="test-jira-entry-service")
-    jira_issue = JiraIssues(
-        service=service,
-        issue_key="TEST-1234",
-        title="Test Issue",
-        url="https://jira.com",
-        project="TEST",
-        severity="blocker",
-        status="Open",
-        customer_escaped=False,
-        date_created="2024-01-01",
-        last_updated="2024-01-01",
-    )
-    all_jira_issues = JiraIssues.select()
-    assert jira_issue.issue_key in [j.issue_key for j in all_jira_issues]
+@pytest.mark.usefixtures("temp_sqlite_db", "fake_jira_issue")
+@orm.db_session
+def test_database_jira_issues_entry(temp_sqlite_db, fake_jira_issue):
+    service = temp_sqlite_db.Services(name="test-jira-entry-service")
+    test_jira_issue = temp_sqlite_db.JiraIssues(service=service, **fake_jira_issue)
+    all_jira_issues = temp_sqlite_db.JiraIssues.select()
+    assert test_jira_issue.issue_key in [
+        issue.issue_key for issue in all_jira_issues
+    ], "Test Jira issue not found in database."

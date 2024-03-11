@@ -1,11 +1,12 @@
 database:
     host: <FQDN or IP of the database server>
-    port: <Database service port number>
+    port: <Database service port number. Default 5432.>
     user: <Username used to connect to database>
     password: <Password used to connect to database>
     database: <Name of the Database>
+    provider: <Database provider. Default "postgres".>
     local: <A boolean value. If "true", a local SQLite database. If "false", the creds above are used. Default "false".>
-    local_filepath: <Optional path to the local SQLite database file>
+    local_filepath: <Optional path to the local SQLite database file. Default "/tmp/qe_metrics.sqlite".>
 jira:
   token: <Jira API token>
   server: <FQDN or IP of the Jira server>
