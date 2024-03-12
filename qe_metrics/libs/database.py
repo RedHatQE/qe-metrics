@@ -74,7 +74,7 @@ class Database:
             )
         else:
             self.logger.error(
-                f"Some or all configuration values in the database section of {self.creds_file} are missing."
+                f'Some or all configuration values in the "database" section of {self.creds_file} are missing.'
             )
             raise click.Abort()
 
