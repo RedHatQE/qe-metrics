@@ -2,6 +2,8 @@
 
 Queries Jira and stores results in a database for further analysis in Grafana.
 
+<!-- TODO: Add step-by-step instructions for adding a service to the regular execution of this tool -->
+
 ## Configuration
 
 ### Credentials
@@ -35,7 +37,7 @@ Optional values:
 
 - `port`: The port number of the database service.
   - Default: `5432`.
-- `provider`: Database provider.
+- `provider`: Database provider. Please see [supported providers](https://ponyorm.readthedocs.io/en/latest/api_reference.html#supported-databases).
   - Default: `postgres`.
 - `local`: A boolean value. If "true", a local SQLite database. If "false", the creds above are used.
   - Default: `false`
@@ -46,3 +48,9 @@ Optional values:
 
 - `token`: The API token used to authenticate with the Jira server.
 - `server`: The FQDN or IP of the Jira server.
+
+<!-- TODO: Add configuration details for services and queries -->
+
+<!-- TODO: Add DB schema and explanation -->
+
+<!-- TODO: Add outline of how CI will work -->
