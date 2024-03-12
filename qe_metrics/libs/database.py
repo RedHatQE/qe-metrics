@@ -8,7 +8,6 @@ from pyaml_env import parse_config
 from simple_logger.logger import get_logger
 
 DB_CONNECTION = orm.Database()
-DEFAULT_SQLITE_DB_FILEPATH = "/tmp/qe_metrics.sqlite"
 
 
 class Database:
@@ -51,7 +50,7 @@ class Database:
         """
         Bind a local database connection using SQLite.
         """
-        sqlite_filepath = self.db_creds.get("local_filepath", DEFAULT_SQLITE_DB_FILEPATH)
+        sqlite_filepath = self.db_creds.get("local_filepath", "/tmp/qe_metrics.sqlite")
         self.logger.info(f"Local database connection enabled, using SQLite database at {sqlite_filepath}")
         self.connection.bind(provider="sqlite", filename=sqlite_filepath, create_db=not os.path.exists(sqlite_filepath))
 
