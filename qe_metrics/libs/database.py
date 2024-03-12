@@ -2,7 +2,6 @@ import os
 from types import TracebackType
 from typing import Optional, Type
 
-import click
 from datetime import date
 from pony import orm
 from pyaml_env import parse_config
@@ -10,8 +9,6 @@ from simple_logger.logger import get_logger
 
 DB_CONNECTION = orm.Database()
 DEFAULT_SQLITE_DB_FILEPATH = "/tmp/qe_metrics.sqlite"
-DEFAULT_REMOTE_SQL_PROVIDER = "postgres"
-DEFAULT_REMOTE_SQL_PORT = 5432
 
 
 class Database:
@@ -24,7 +21,7 @@ class Database:
             verbose (bool): Verbose output of database connection and transactions.
         """
         self.logger = get_logger(name=self.__class__.__module__)
-        orm.set_sql_debug(verbose)  # Set verbose database connection if requested
+        orm.set_sql_debug(verbose)
 
         self.creds_file = creds_file
         self.db_creds = parse_config(self.creds_file)["database"]
@@ -63,22 +60,17 @@ class Database:
         Bind a remote database connection.
         """
         self.logger.info("Remote database connection enabled, connecting to database")
-        if self.remote_db_creds_exist():
+        if self.verify_remote_db_creds():
             self.connection.bind(
                 host=self.db_creds["host"],
                 user=self.db_creds["user"],
                 password=self.db_creds["password"],
                 database=self.db_creds["database"],
-                port=self.db_creds.get("port", DEFAULT_REMOTE_SQL_PORT),
-                provider=self.db_creds.get("provider", DEFAULT_REMOTE_SQL_PROVIDER),
+                port=self.db_creds.get("port", 5432),
+                provider=self.db_creds.get("provider", "postgres"),
             )
-        else:
-            self.logger.error(
-                f'Some or all configuration values in the "database" section of {self.creds_file} are missing.'
-            )
-            raise click.Abort()
 
-    def remote_db_creds_exist(self) -> bool:
+    def verify_remote_db_creds(self) -> bool:
         """
         Check if the remote database values exist in the configuration file.
 
@@ -86,7 +78,13 @@ class Database:
             bool: True if the remote database values exist, False otherwise.
         """
         required_keys = ["host", "user", "password", "database"]
-        return all(self.db_creds.get(key) is not None for key in required_keys)
+        missing_keys = [key for key in required_keys if self.db_creds.get(key) is None]
+
+        if missing_keys:
+            missing_keys_str = ", ".join(missing_keys)
+            raise ValueError(f"Missing keys in the configuration file: {missing_keys_str}")
+
+        return True
 
     class Services(DB_CONNECTION.Entity):  # type: ignore
         """

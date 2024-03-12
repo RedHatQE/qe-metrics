@@ -1,15 +1,17 @@
-import tempfile
 import pytest
-import os
 import yaml
 from qe_metrics.libs.database import Database
-
-
-TEMP_DB_FILE = "/tmp/qe_metrics_test.sqlite"
+from pony import orm
 
 
 @pytest.fixture(scope="module")
-def temp_sqlite_db(temp_db_creds) -> Database:
+def db_session():
+    with orm.db_session:
+        yield
+
+
+@pytest.fixture(scope="module")
+def tmp_sqlite_db(tmp_db_creds) -> Database:
     """
     Setup and teardown a temporary SQLite database for testing.
 
@@ -17,28 +19,45 @@ def temp_sqlite_db(temp_db_creds) -> Database:
         Database: Database object
     """
 
-    with Database(creds_file=temp_db_creds, verbose=False) as database:
+    with Database(creds_file=tmp_db_creds, verbose=False) as database:
         yield database
-
-    if os.path.exists(TEMP_DB_FILE):
-        os.remove(TEMP_DB_FILE)
 
 
 @pytest.fixture(scope="session")
-def temp_db_creds() -> str:
+def tmp_db_creds(tmp_path_factory) -> str:
     """
     Setup and teardown a temporary database credentials file for testing.
 
     Yields:
         str: Temporary database credentials file path
     """
+    tmp_dir = tmp_path_factory.mktemp(basename="qe-metrics-test")
+
     creds = {
         "database": {
             "local": True,
-            "local_filepath": TEMP_DB_FILE,
+            "local_filepath": str(tmp_dir / "qe_metrics_test.sqlite"),
         }
     }
 
-    with tempfile.NamedTemporaryFile("w", suffix=".yaml") as temp_creds:
-        yaml.dump(creds, temp_creds)
-        yield temp_creds.name
+    with open(tmp_dir / "creds.yaml", "w") as tmp_creds:
+        yaml.dump(creds, tmp_creds)
+    yield tmp_creds.name
+
+
+@pytest.fixture
+def service(db_session, tmp_sqlite_db, request):
+    return tmp_sqlite_db.Services(name=request.param)
+
+
+@pytest.fixture
+def jira_issue(db_session, tmp_sqlite_db, service, request):
+    """
+    Setup a JiraIssues entry for testing.
+
+    Yields:
+        JiraIssues: JiraIssues object
+    """
+    with orm.db_session:
+        jira_issue = tmp_sqlite_db.JiraIssues(service=service, **request.param)
+        yield jira_issue
