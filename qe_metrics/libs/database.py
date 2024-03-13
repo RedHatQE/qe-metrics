@@ -6,6 +6,7 @@ from datetime import date
 from pony import orm
 from pyaml_env import parse_config
 from simple_logger.logger import get_logger
+from qe_metrics.utils.general import verify_creds
 
 DB_CONNECTION = orm.Database()
 
@@ -59,31 +60,15 @@ class Database:
         Bind a remote database connection.
         """
         self.logger.info("Remote database connection enabled, connecting to database")
-        if self.verify_remote_db_creds():
-            self.connection.bind(
-                host=self.db_creds["host"],
-                user=self.db_creds["user"],
-                password=self.db_creds["password"],
-                database=self.db_creds["database"],
-                port=self.db_creds.get("port", 5432),
-                provider=self.db_creds.get("provider", "postgres"),
-            )
-
-    def verify_remote_db_creds(self) -> bool:
-        """
-        Check if the remote database values exist in the configuration file.
-
-        Returns:
-            bool: True if the remote database values exist, False otherwise.
-        """
-        required_keys = ["host", "user", "password", "database"]
-        missing_keys = [key for key in required_keys if self.db_creds.get(key) is None]
-
-        if missing_keys:
-            missing_keys_str = ", ".join(missing_keys)
-            raise ValueError(f"Missing keys in the configuration file: {missing_keys_str}")
-
-        return True
+        verify_creds(creds=self.db_creds, required_keys=["host", "user", "password", "database"])
+        self.connection.bind(
+            host=self.db_creds["host"],
+            user=self.db_creds["user"],
+            password=self.db_creds["password"],
+            database=self.db_creds["database"],
+            port=self.db_creds.get("port", 5432),
+            provider=self.db_creds.get("provider", "postgres"),
+        )
 
     class Services(DB_CONNECTION.Entity):  # type: ignore
         """
