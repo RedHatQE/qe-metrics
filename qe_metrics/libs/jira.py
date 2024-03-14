@@ -1,5 +1,4 @@
 from typing import Any
-import re
 
 import click
 from jira import JIRA
