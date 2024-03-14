@@ -28,7 +28,6 @@ from qe_metrics.libs.jira import Jira
 )
 @click.option(
     "--verbose-db",
-
     is_flag=True,
     help="Verbose output of database connection.",
     type=click.BOOL,

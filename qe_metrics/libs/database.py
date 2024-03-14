@@ -10,7 +10,6 @@ from qe_metrics.utils.general import verify_config
 
 
 class Database:
-
     DB_CONNECTION = orm.Database()
 
     def __init__(self, config_file: str, verbose: bool) -> None:
@@ -48,7 +47,9 @@ class Database:
         """
         sqlite_filepath = self.db_config.get("local_filepath", "/tmp/qe_metrics.sqlite")
         self.logger.info(f"Local database connection enabled, using SQLite database at {sqlite_filepath}")
-        self.DB_CONNECTION.bind(provider="sqlite", filename=sqlite_filepath, create_db=not os.path.exists(sqlite_filepath))
+        self.DB_CONNECTION.bind(
+            provider="sqlite", filename=sqlite_filepath, create_db=not os.path.exists(sqlite_filepath)
+        )
 
     def bind_remote_db_connection(self) -> None:
         """
