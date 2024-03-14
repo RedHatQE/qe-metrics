@@ -8,8 +8,9 @@ Queries Jira and stores results in a database for further analysis in Grafana.
 
 ### Credentials
 
-The qe-metrics tool uses a YAML file passed to it using the `--creds-file` option as its source of credentials. The file
-holds credentials for both the database and the Jira server used by the tool. Here is an example of a credentials file:
+The qe-metrics tool uses a YAML file passed to it using the `--config-file` option as its source of credentials and other
+configuration values. The file holds these values for both the database and the Jira server used by the tool.
+Here is an example of a configuration file:
 
 ```yaml
 database:
@@ -26,7 +27,7 @@ jira:
   server: jira-server.com
 ````
 
-#### Database Credentials
+#### Database Credentials and Configuration
 
 - `host`: The FQDN or IP of the database server.
 - `user`: The username used to connect to the database.
@@ -44,7 +45,7 @@ Optional values:
 - `local_filepath`: Optional path to the local SQLite database file.
   - Default: `/tmp/qe_metrics.sqlite`
 
-#### Jira Credentials
+#### Jira Credentials and Configuration
 
 - `token`: The API token used to authenticate with the Jira server.
 - `server`: The FQDN or IP of the Jira server.
