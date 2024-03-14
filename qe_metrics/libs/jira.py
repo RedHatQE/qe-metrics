@@ -6,20 +6,20 @@ from jira import JIRA
 from jira.exceptions import JIRAError
 from pyaml_env import parse_config
 from simple_logger.logger import get_logger
-from qe_metrics.utils.general import verify_creds
+from qe_metrics.utils.general import verify_config
 
 
 class Jira:
-    def __init__(self, creds_file: str) -> None:
+    def __init__(self, config_file: str) -> None:
         """
         Initialize the Jira class
 
         Args:
-            creds_file (str): Path to the yaml file holding database and Jira credentials.
+            config_file (str): Path to the yaml file holding database and Jira configuration.
         """
         self.logger = get_logger(name=self.__class__.__module__)
 
-        self.jira_creds = parse_config(creds_file)["jira"]
+        self.jira_config = parse_config(config_file)["jira"]
 
     @property
     def connection(self) -> JIRA:
@@ -29,27 +29,14 @@ class Jira:
         Returns:
             JIRA: Jira connection
         """
-        verify_creds(creds=self.jira_creds, required_keys=["token", "server"])
+        verify_config(config=self.jira_config, required_keys=["token", "server"])
         try:
-            connection = JIRA(server=self._force_https(self.jira_creds["server"]), token_auth=self.jira_creds["token"])
-            self.logger.success(f'Successfully authenticated to Jira server {self.jira_creds["server"]}')
+            connection = JIRA(server=self.jira_config["server"], token_auth=self.jira_config["token"])
+            self.logger.success(f'Successfully authenticated to Jira server {self.jira_config["server"]}')
             return connection
         except JIRAError as error:
-            self.logger.error(f'Failed to connect to Jira server {self.jira_creds["server"]}: {error}')
+            self.logger.error(f'Failed to connect to Jira server {self.jira_config["server"]}: {error}')
             raise click.Abort()
-
-    @staticmethod
-    def _force_https(server: str) -> str:
-        """
-        Force the server URL to use HTTPS
-
-        Args:
-            server (str): Jira server URL
-
-        Returns:
-            str: Jira server URL with "https://" prefix
-        """
-        return re.sub(r"^(http://)?(https://)?", "https://", server)
 
     def search(self, query: str) -> list[Any]:
         """

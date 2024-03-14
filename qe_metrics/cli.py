@@ -37,7 +37,7 @@ def main(services_file: str, config_file: str, pdb: bool, verbose_db: bool) -> N
 
     # Adding noqa: F841 to ignore the unused variable until next PR, otherwise pre-commit will fail
     with Database(config_file=config_file, verbose=verbose_db) as database:  # noqa: F841
-        jira = Jira(creds_file=config_file)  # noqa: F841
+        jira = Jira(config_file=config_file)  # noqa: F841
 
     # TODO: For each service, execute their defined Jira queries and populate the database accordingly
     # TODO: Run a cleanup of the database to remove old entries
