@@ -24,7 +24,7 @@ database:
     local_filepath: /tmp/my-db.sqlite
 jira:
   token: some-token
-  server: jira-server.com
+  server: https://jira-server.com
 ````
 
 #### Database Credentials and Configuration
@@ -48,7 +48,7 @@ Optional values:
 #### Jira Credentials and Configuration
 
 - `token`: The API token used to authenticate with the Jira server.
-- `server`: The FQDN or IP of the Jira server.
+- `server`: The FQDN or IP of the Jira server. Must include the protocol (e.g. `https://`).
 
 <!-- TODO: Add configuration details for services and queries -->
 
