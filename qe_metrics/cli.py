@@ -16,9 +16,9 @@ from qe_metrics.libs.jira import Jira
     type=click.Path(exists=True),
 )
 @click.option(
-    "--creds-file",
-    default=os.environ.get("QE_METRICS_CREDS", "creds.yaml"),
-    help="Defines the path to the file holding database and Jira credentials.",
+    "--config-file",
+    default=os.environ.get("QE_METRICS_CONFIG", "config.yaml"),
+    help="Defines the path to the file holding database and Jira configuration.",
     type=click.Path(exists=True),
 )
 @click.option(
@@ -28,16 +28,17 @@ from qe_metrics.libs.jira import Jira
 )
 @click.option(
     "--verbose-db",
+
     is_flag=True,
     help="Verbose output of database connection.",
     type=click.BOOL,
 )
-def main(services_file: str, creds_file: str, pdb: bool, verbose_db: bool) -> None:
+def main(services_file: str, config_file: str, pdb: bool, verbose_db: bool) -> None:
     """Gather QE Metrics"""
 
     # Adding noqa: F841 to ignore the unused variable until next PR, otherwise pre-commit will fail
-    with Database(creds_file=creds_file, verbose=verbose_db) as database:  # noqa: F841
-        jira = Jira(creds_file=creds_file)  # noqa: F841
+    with Database(config_file=config_file, verbose=verbose_db) as database:  # noqa: F841
+        jira = Jira(creds_file=config_file)  # noqa: F841
 
     # TODO: For each service, execute their defined Jira queries and populate the database accordingly
     # TODO: Run a cleanup of the database to remove old entries

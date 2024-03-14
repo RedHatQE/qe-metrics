@@ -11,7 +11,7 @@ def db_session():
 
 
 @pytest.fixture(scope="module")
-def tmp_sqlite_db(tmp_db_creds) -> Database:
+def tmp_sqlite_db(tmp_db_config) -> Database:
     """
     Setup and teardown a temporary SQLite database for testing.
 
@@ -19,12 +19,12 @@ def tmp_sqlite_db(tmp_db_creds) -> Database:
         Database: Database object
     """
 
-    with Database(creds_file=tmp_db_creds, verbose=False) as database:
+    with Database(config_file=tmp_db_config, verbose=False) as database:
         yield database
 
 
 @pytest.fixture(scope="session")
-def tmp_db_creds(tmp_path_factory) -> str:
+def tmp_db_config(tmp_path_factory) -> str:
     """
     Setup and teardown a temporary database credentials file for testing.
 
@@ -33,16 +33,16 @@ def tmp_db_creds(tmp_path_factory) -> str:
     """
     tmp_dir = tmp_path_factory.mktemp(basename="qe-metrics-test")
 
-    creds = {
+    config = {
         "database": {
             "local": True,
             "local_filepath": str(tmp_dir / "qe_metrics_test.sqlite"),
         }
     }
 
-    with open(tmp_dir / "creds.yaml", "w") as tmp_creds:
-        yaml.dump(creds, tmp_creds)
-    yield tmp_creds.name
+    with open(tmp_dir / "config.yaml", "w") as tmp_config:
+        yaml.dump(config, tmp_config)
+    yield tmp_config.name
 
 
 @pytest.fixture

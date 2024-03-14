@@ -6,33 +6,28 @@ from datetime import date
 from pony import orm
 from pyaml_env import parse_config
 from simple_logger.logger import get_logger
-from qe_metrics.utils.general import verify_creds
-
-DB_CONNECTION = orm.Database()
+from qe_metrics.utils.general import verify_config
 
 
 class Database:
-    def __init__(self, creds_file: str, verbose: bool) -> None:
+
+    DB_CONNECTION = orm.Database()
+
+    def __init__(self, config_file: str, verbose: bool) -> None:
         """
         Initialize the Database class
 
         Args:
-            creds_file (str): Path to the yaml file holding database and Jira credentials.
+            config_file (str): Path to the yaml file holding database and Jira configuration.
             verbose (bool): Verbose output of database connection and transactions.
         """
         self.logger = get_logger(name=self.__class__.__module__)
         orm.set_sql_debug(verbose)
 
-        self.creds_file = creds_file
-        self.db_creds = parse_config(self.creds_file)["database"]
-        self.connection = DB_CONNECTION
-
-        if self.db_creds.get("local"):
-            self.bind_local_db_connection()
-        else:
-            self.bind_remote_db_connection()
-
-        self.connection.generate_mapping(create_tables=True)
+        self.config_file = config_file
+        self.db_config = parse_config(self.config_file)["database"]
+        self.bind_local_db_connection() if self.db_config.get("local") else self.bind_remote_db_connection()
+        self.DB_CONNECTION.generate_mapping(create_tables=True)
 
     def __enter__(self) -> "Database":
         return self
@@ -43,31 +38,31 @@ class Database:
         exc_value: Optional[BaseException],
         traceback: Optional[TracebackType],
     ) -> None:
-        if self.connection:
-            self.connection.disconnect()
+        if self.DB_CONNECTION:
+            self.DB_CONNECTION.disconnect()
             self.logger.info("Disconnected from the database")
 
     def bind_local_db_connection(self) -> None:
         """
         Bind a local database connection using SQLite.
         """
-        sqlite_filepath = self.db_creds.get("local_filepath", "/tmp/qe_metrics.sqlite")
+        sqlite_filepath = self.db_config.get("local_filepath", "/tmp/qe_metrics.sqlite")
         self.logger.info(f"Local database connection enabled, using SQLite database at {sqlite_filepath}")
-        self.connection.bind(provider="sqlite", filename=sqlite_filepath, create_db=not os.path.exists(sqlite_filepath))
+        self.DB_CONNECTION.bind(provider="sqlite", filename=sqlite_filepath, create_db=not os.path.exists(sqlite_filepath))
 
     def bind_remote_db_connection(self) -> None:
         """
         Bind a remote database connection.
         """
         self.logger.info("Remote database connection enabled, connecting to database")
-        verify_creds(creds=self.db_creds, required_keys=["host", "user", "password", "database"])
-        self.connection.bind(
-            host=self.db_creds["host"],
-            user=self.db_creds["user"],
-            password=self.db_creds["password"],
-            database=self.db_creds["database"],
-            port=self.db_creds.get("port", 5432),
-            provider=self.db_creds.get("provider", "postgres"),
+        verify_config(config=self.db_config, required_keys=["host", "user", "password", "database"])
+        self.DB_CONNECTION.bind(
+            host=self.db_config["host"],
+            user=self.db_config["user"],
+            password=self.db_config["password"],
+            database=self.db_config["database"],
+            port=self.db_config.get("port", 5432),
+            provider=self.db_config.get("provider", "postgres"),
         )
 
     class Services(DB_CONNECTION.Entity):  # type: ignore
