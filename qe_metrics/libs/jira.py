@@ -48,7 +48,7 @@ class Jira:
             list[Any]: List of Jira issues returned from the query.
         """
         try:
-            return self.connection.search_issues(query, maxResults=False, validate_query=True)
+            return self.connection.search_issues(query, maxResults=False)
         except JIRAError as error:
             self.logger.error(f"Failed to execute Jira query: {error}")
             raise click.Abort()
