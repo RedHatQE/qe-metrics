@@ -47,7 +47,8 @@ def tmp_db_config(tmp_path_factory) -> str:
 
 @pytest.fixture
 def service(db_session, tmp_sqlite_db, request):
-    return tmp_sqlite_db.Services(name=request.param)
+    service_name, queries = request.param
+    return tmp_sqlite_db.Services(name=service_name, queries=queries)
 
 
 @pytest.fixture

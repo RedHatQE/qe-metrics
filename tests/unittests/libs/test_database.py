@@ -2,7 +2,11 @@ import pytest
 from pony import orm
 
 
-@pytest.mark.parametrize("service", ["test-service-entry-service"], indirect=True)
+@pytest.mark.parametrize(
+    "service",
+    [("test-service-entry-service", {"blocker": "BLOCKER QUERY", "critical-blocker": "CRITICAL BLOCKER QUERY"})],
+    indirect=True,
+)
 @orm.db_session
 def test_database_services_entry(tmp_sqlite_db, service):
     all_services = tmp_sqlite_db.Services.select()
@@ -11,7 +15,11 @@ def test_database_services_entry(tmp_sqlite_db, service):
     ], f"Test service {service.name} not found in database."
 
 
-@pytest.mark.parametrize("service", ["test-jira-entry-service"], indirect=True)
+@pytest.mark.parametrize(
+    "service",
+    [("test-jira-entry-service", {"blocker": "BLOCKER QUERY", "critical-blocker": "CRITICAL BLOCKER QUERY"})],
+    indirect=True,
+)
 @pytest.mark.parametrize(
     "jira_issue",
     [

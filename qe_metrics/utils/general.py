@@ -30,7 +30,7 @@ def verify_queries(queries_dict: dict[str, str]) -> None:
     Also verify that there are no other queries other than the ones in required_queries.
 
     Args:
-        queries (dict[str, str]): Dictionary holding the queries.
+        queries_dict (dict[str, str]): Dictionary holding the queries.
 
     Raises:
         ValueError: If any of the required queries are missing or the required queries values are None in the queries' dictionary.
