@@ -64,7 +64,7 @@ another_service:
   critical-blocker: "project = 'SERVICE2' AND resolution = Unresolved AND Issuetype = bug AND priority = blocker AND labels = 'critical'"
 ```
 
-The example above defines two "services", `some_service` and `another_service`, each with two queries. The queries have a 
+The example above defines two "services", `some_service` and `another_service`, each with two queries. The queries have a
 "severity" of `blocker` and `critical-blocker`. The queries are written in [Jira Query Language (JQL)](https://support.atlassian.com/jira-software-cloud/docs/use-advanced-search-with-jira-query-language-jql/)
 and are used to define which issues should be associated with the `service` and `severity` in the database.
 
