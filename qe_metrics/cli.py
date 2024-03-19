@@ -36,10 +36,13 @@ def main(services_file: str, config_file: str, pdb: bool, verbose_db: bool) -> N
     """Gather QE Metrics"""
 
     # Adding noqa: F841 to ignore the unused variable until next PR, otherwise pre-commit will fail
-    with Database(config_file=config_file, verbose=verbose_db) as database:  # noqa: F841
+    with Database(config_file=config_file, verbose=verbose_db) as database:
         jira = Jira(config_file=config_file)  # noqa: F841
-
-    # TODO: For each service, execute their defined Jira queries and populate the database accordingly
+        services = database.Services.from_file(services_file=services_file)
+        for service in services:
+            for severity, query in service.queries.items():
+                # TODO: Execute Jira query and populate the database
+                pass  # TODO: Remove this line once the code is implemented
     # TODO: Run a cleanup of the database to remove old entries
 
 

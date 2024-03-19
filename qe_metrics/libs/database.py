@@ -1,11 +1,12 @@
 import os
 from types import TracebackType
-from typing import Optional, Type
+from typing import Optional, Type, List
 
 from datetime import date
 from pony import orm
 from pyaml_env import parse_config
 from simple_logger.logger import get_logger
+
 from qe_metrics.utils.general import verify_config
 
 
@@ -74,6 +75,30 @@ class Database:
         id = orm.PrimaryKey(int, auto=True)
         name = orm.Required(str, unique=True)
         jira_issues = orm.Set("JiraIssues")
+        queries = orm.Required(orm.Json)
+
+        @classmethod
+        @orm.db_session
+        def from_file(cls, services_file: str) -> List["Database.Services"]:
+            """
+            Initialize the Service class from a file. Create new entries if they do not exist. Update the queries if
+            they are modified.
+
+            Args:
+                services_file (str): Path to the yaml file holding service names and their queries
+
+            Returns:
+                List["Database.Services"]: A list of Service objects
+            """
+            services_dict = parse_config(services_file)
+            services = [
+                cls(name=name, queries=queries)
+                if not (service := cls.get(name=name))
+                else (setattr(service, "queries", queries) or service)  # type: ignore
+                for name, queries in services_dict.items()
+            ]
+            orm.commit()
+            return services
 
     class JiraIssues(DB_CONNECTION.Entity):  # type: ignore
         """
