@@ -7,7 +7,7 @@ from pony import orm
 from pyaml_env import parse_config
 from simple_logger.logger import get_logger
 
-from qe_metrics.utils.general import verify_config
+from qe_metrics.utils.general import verify_config, verify_queries
 
 
 class Database:
@@ -91,12 +91,14 @@ class Database:
                 List["Database.Services"]: A list of Service objects
             """
             services_dict = parse_config(services_file)
-            services = [
-                cls(name=name, queries=queries)
-                if not (service := cls.get(name=name))
-                else (setattr(service, "queries", queries) or service)  # type: ignore
-                for name, queries in services_dict.items()
-            ]
+            services = []
+            for name, queries in services_dict.items():
+                verify_queries(queries_dict=queries)
+                if not (service := cls.get(name=name)):
+                    services.append(cls(name=name, queries=queries))
+                else:
+                    setattr(service, "queries", queries)
+                    services.append(service)
             orm.commit()
             return services
 
