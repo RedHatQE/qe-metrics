@@ -1,9 +1,7 @@
-# Just an example of a couple of services.
-temp_service:
+# Just an example of a couple of products.
+temp_product:
   blocker: "some query to get the blocker issues"
   critical-blocker: "some query to get the critical blocker issues"
-  customer-escaped: "some query to get the customer escaped issues"
-temp_service_2:
+temp_product_2:
   blocker: "some query to get the blocker issues"
   critical-blocker: "some query to get the critical blocker issues"
-  customer-escaped: "some query to get the customer escaped issues"

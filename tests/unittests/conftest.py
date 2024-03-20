@@ -46,13 +46,13 @@ def tmp_db_config(tmp_path_factory) -> str:
 
 
 @pytest.fixture
-def service(db_session, tmp_sqlite_db, request):
-    service_name, queries = request.param
-    return tmp_sqlite_db.Services(name=service_name, queries=queries)
+def product(db_session, tmp_sqlite_db, request):
+    product_name, queries = request.param
+    return tmp_sqlite_db.Products(name=product_name, queries=queries)
 
 
 @pytest.fixture
-def jira_issue(db_session, tmp_sqlite_db, service, request):
+def jira_issue(db_session, tmp_sqlite_db, product, request):
     """
     Setup a JiraIssues entry for testing.
 
@@ -60,5 +60,5 @@ def jira_issue(db_session, tmp_sqlite_db, service, request):
         JiraIssues: JiraIssues object
     """
     with orm.db_session:
-        jira_issue = tmp_sqlite_db.JiraIssues(service=service, **request.param)
+        jira_issue = tmp_sqlite_db.JiraIssues(product=product, **request.param)
         yield jira_issue

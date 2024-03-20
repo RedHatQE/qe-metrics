@@ -67,9 +67,9 @@ class Database:
             provider=self.db_config.get("provider", "postgres"),
         )
 
-    class Services(DB_CONNECTION.Entity):  # type: ignore
+    class Products(DB_CONNECTION.Entity):  # type: ignore
         """
-        A class to represent the Services table in the database.
+        A class to represent the Products table in the database.
         """
 
         id = orm.PrimaryKey(int, auto=True)
@@ -79,28 +79,28 @@ class Database:
 
         @classmethod
         @orm.db_session
-        def from_file(cls, services_file: str) -> List["Database.Services"]:
+        def from_file(cls, products_file: str) -> List["Database.Products"]:
             """
-            Initialize the Service class from a file. Create new entries if they do not exist. Update the queries if
+            Initialize the Products class from a file. Create new entries if they do not exist. Update the queries if
             they are modified.
 
             Args:
-                services_file (str): Path to the yaml file holding service names and their queries
+                products_file (str): Path to the yaml file holding product names and their queries
 
             Returns:
-                List["Database.Services"]: A list of Service objects
+                List["Database.Products"]: A list of Products objects
             """
-            services_dict = parse_config(services_file)
-            services = []
-            for name, queries in services_dict.items():
+            products_dict = parse_config(products_file)
+            products = []
+            for name, queries in products_dict.items():
                 verify_queries(queries_dict=queries)
-                if not (service := cls.get(name=name)):
-                    services.append(cls(name=name, queries=queries))
+                if not (product := cls.get(name=name)):
+                    products.append(cls(name=name, queries=queries))
                 else:
-                    setattr(service, "queries", queries)
-                    services.append(service)
+                    setattr(product, "queries", queries)
+                    products.append(product)
             orm.commit()
-            return services
+            return products
 
     class JiraIssues(DB_CONNECTION.Entity):  # type: ignore
         """
@@ -108,7 +108,7 @@ class Database:
         """
 
         id = orm.PrimaryKey(int, auto=True)
-        service = orm.Required("Services")
+        product = orm.Required("Products")
         issue_key = orm.Required(str, unique=True)
         title = orm.Required(str)
         url = orm.Required(str)

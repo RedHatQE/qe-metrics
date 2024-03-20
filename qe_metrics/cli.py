@@ -10,9 +10,9 @@ from qe_metrics.libs.jira import Jira
 
 @click.command()
 @click.option(
-    "--services-file",
-    default=os.environ.get("QE_METRICS_SERVICES", "services.yaml"),
-    help="Defines the path to the file holding a list of services and their Jira queries.",
+    "--products-file",
+    default=os.environ.get("QE_METRICS_PRODUCTS", "products.yaml"),
+    help="Defines the path to the file holding a list of products and their Jira queries.",
     type=click.Path(exists=True),
 )
 @click.option(
@@ -32,15 +32,15 @@ from qe_metrics.libs.jira import Jira
     help="Verbose output of database connection.",
     type=click.BOOL,
 )
-def main(services_file: str, config_file: str, pdb: bool, verbose_db: bool) -> None:
+def main(products_file: str, config_file: str, pdb: bool, verbose_db: bool) -> None:
     """Gather QE Metrics"""
 
     # Adding noqa: F841 to ignore the unused variable until next PR, otherwise pre-commit will fail
     with Database(config_file=config_file, verbose=verbose_db) as database:
         jira = Jira(config_file=config_file)  # noqa: F841
-        services = database.Services.from_file(services_file=services_file)
-        for service in services:
-            for severity, query in service.queries.items():
+        products = database.Products.from_file(products_file=products_file)
+        for product in products:
+            for severity, query in product.queries.items():
                 # TODO: Execute Jira query and populate the database
                 pass  # TODO: Remove this line once the code is implemented
     # TODO: Run a cleanup of the database to remove old entries

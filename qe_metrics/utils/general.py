@@ -39,10 +39,10 @@ def verify_queries(queries_dict: dict[str, str]) -> None:
     required_queries = ["blocker", "critical-blocker"]
 
     if missing_queries := [query for query in required_queries if query not in queries_dict]:
-        raise ValueError(f"Missing queries in the services file: {' '.join(missing_queries)}")
+        raise ValueError(f"Missing queries in the products file: {' '.join(missing_queries)}")
 
     if none_values_queries := [query for query in required_queries if queries_dict.get(query) is None]:
         raise ValueError(f"The following queries have None values: {' '.join(none_values_queries)}")
 
     if extra_queries := [query for query in queries_dict if query not in required_queries]:
-        raise ValueError(f"Extra queries in the services file: {' '.join(extra_queries)}")
+        raise ValueError(f"Extra queries in the products file: {' '.join(extra_queries)}")

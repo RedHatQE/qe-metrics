@@ -2,7 +2,7 @@
 
 Queries Jira and stores results in a database for further analysis in Grafana.
 
-<!-- TODO: Add step-by-step instructions for adding a service to the regular execution of this tool -->
+<!-- TODO: Add step-by-step instructions for adding a product to the regular execution of this tool -->
 
 ## Configuration
 
@@ -50,23 +50,23 @@ Optional values:
 - `token`: The API token used to authenticate with the Jira server.
 - `server`: The FQDN or IP of the Jira server. Must include the protocol (e.g. `https://`).
 
-### Services and Queries
+### Products and Queries
 
-The qe-metrics tool uses a YAML file passed to it using the `--services-file` option as its source of services and queries.
-The file should hold a list of defined services, each with a list of Jira queries to be executed. Here is an example of a services file:
+The qe-metrics tool uses a YAML file passed to it using the `--products-file` option as its source of products and queries.
+The file should hold a list of defined products, each with a list of Jira queries to be executed. Here is an example of a products file:
 
 ```yaml
-some_service:
-  blocker: "project = 'SERVICE' AND resolution = Unresolved AND Issuetype = bug AND priority = blocker"
-  critical-blocker: "project = 'SERVICE' AND resolution = Unresolved AND Issuetype = bug AND priority = blocker AND labels = 'critical'"
-another_service:
-  blocker: "project = 'SERVICE2' AND resolution = Unresolved AND Issuetype = bug AND priority = blocker"
-  critical-blocker: "project = 'SERVICE2' AND resolution = Unresolved AND Issuetype = bug AND priority = blocker AND labels = 'critical'"
+some_product:
+  blocker: "project = 'PRODUCT' AND resolution = Unresolved AND Issuetype = bug AND priority = blocker"
+  critical-blocker: "project = 'PRODUCT' AND resolution = Unresolved AND Issuetype = bug AND priority = blocker AND labels = 'critical'"
+another_product:
+  blocker: "project = 'PRODUCT2' AND resolution = Unresolved AND Issuetype = bug AND priority = blocker"
+  critical-blocker: "project = 'PRODUCT2' AND resolution = Unresolved AND Issuetype = bug AND priority = blocker AND labels = 'critical'"
 ```
 
-The example above defines two "services", `some_service` and `another_service`, each with two queries. The queries have a
+The example above defines two "products", `some_product` and `another_product`, each with two queries. The queries have a
 "severity" of `blocker` and `critical-blocker`. The queries are written in [Jira Query Language (JQL)](https://support.atlassian.com/jira-software-cloud/docs/use-advanced-search-with-jira-query-language-jql/)
-and are used to define which issues should be associated with the `service` and `severity` in the database.
+and are used to define which issues should be associated with the `product` and `severity` in the database.
 
 #### Severity
 
@@ -75,8 +75,6 @@ severities are supported:
 
 - `blocker`
 - `critical-blocker`
-
-More severities may be added in the future, but those are the only two severities allowed in the "services" file currently.
 
 <!-- TODO: Add DB schema and explanation -->
 

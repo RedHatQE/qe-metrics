@@ -3,21 +3,21 @@ from pony import orm
 
 
 @pytest.mark.parametrize(
-    "service",
-    [("test-service-entry-service", {"blocker": "BLOCKER QUERY", "critical-blocker": "CRITICAL BLOCKER QUERY"})],
+    "product",
+    [("test-product-entry-product", {"blocker": "BLOCKER QUERY", "critical-blocker": "CRITICAL BLOCKER QUERY"})],
     indirect=True,
 )
 @orm.db_session
-def test_database_services_entry(tmp_sqlite_db, service):
-    all_services = tmp_sqlite_db.Services.select()
-    assert service.name in [
-        service.name for service in all_services
-    ], f"Test service {service.name} not found in database."
+def test_database_products_entry(tmp_sqlite_db, product):
+    all_products = tmp_sqlite_db.Products.select()
+    assert product.name in [
+        product.name for product in all_products
+    ], f"Test product {product.name} not found in database."
 
 
 @pytest.mark.parametrize(
-    "service",
-    [("test-jira-entry-service", {"blocker": "BLOCKER QUERY", "critical-blocker": "CRITICAL BLOCKER QUERY"})],
+    "product",
+    [("test-jira-entry-product", {"blocker": "BLOCKER QUERY", "critical-blocker": "CRITICAL BLOCKER QUERY"})],
     indirect=True,
 )
 @pytest.mark.parametrize(
@@ -38,7 +38,7 @@ def test_database_services_entry(tmp_sqlite_db, service):
     indirect=True,
 )
 @orm.db_session
-def test_database_jira_issues_entry(tmp_sqlite_db, service, jira_issue):
+def test_database_jira_issues_entry(tmp_sqlite_db, product, jira_issue):
     all_jira_issues = tmp_sqlite_db.JiraIssues.select()
     assert jira_issue.issue_key in [
         issue.issue_key for issue in all_jira_issues
