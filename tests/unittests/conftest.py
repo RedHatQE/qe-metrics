@@ -23,7 +23,7 @@ def tmp_sqlite_db(tmp_db_config) -> Database:
         yield database
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def tmp_db_config(tmp_path_factory) -> str:
     """
     Setup and teardown a temporary database credentials file for testing.
@@ -43,6 +43,15 @@ def tmp_db_config(tmp_path_factory) -> str:
     with open(tmp_dir / "config.yaml", "w") as tmp_config:
         yaml.dump(config, tmp_config)
     yield tmp_config.name
+
+
+@pytest.fixture
+def tmp_products_file(tmp_path, request):
+    products = request.param
+    products_file = tmp_path / "products.yaml"
+    with open(products_file, "w") as tmp_products:
+        yaml.dump(products, tmp_products)
+    yield products_file
 
 
 @pytest.fixture
