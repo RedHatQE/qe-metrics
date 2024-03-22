@@ -6,6 +6,9 @@ from pony import orm
 
 @pytest.fixture(scope="module")
 def db_session():
+    """
+    Setup and teardown a database session for testing.
+    """
     with orm.db_session:
         yield
 
@@ -47,6 +50,12 @@ def tmp_db_config(tmp_path_factory) -> str:
 
 @pytest.fixture
 def tmp_products_file(tmp_path, request):
+    """
+    Setup and teardown a temporary products file for testing.
+
+    Yields:
+        str: Temporary products file path
+    """
     products = request.param
     products_file = tmp_path / "products.yaml"
     with open(products_file, "w") as tmp_products:
@@ -56,6 +65,12 @@ def tmp_products_file(tmp_path, request):
 
 @pytest.fixture
 def product(db_session, tmp_sqlite_db, request):
+    """
+    Create a Products entry in a temporary sqlite database for testing.
+
+    Returns:
+        Products: Products object
+    """
     product_name, queries = request.param
     return tmp_sqlite_db.Products(name=product_name, queries=queries)
 
