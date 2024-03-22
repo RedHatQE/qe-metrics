@@ -75,7 +75,6 @@ class Database:
         id = orm.PrimaryKey(int, auto=True)
         name = orm.Required(str, unique=True)
         jira_issues = orm.Set("JiraIssues")
-        # queries = orm.Required(orm.Json)
 
         def __init__(self, queries: dict[str, str], **kwargs: Any) -> None:
             """
