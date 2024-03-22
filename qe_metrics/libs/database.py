@@ -1,6 +1,6 @@
 import os
 from types import TracebackType
-from typing import Optional, Type, List
+from typing import Optional, Type, List, Any
 
 from datetime import date
 from pony import orm
@@ -75,7 +75,17 @@ class Database:
         id = orm.PrimaryKey(int, auto=True)
         name = orm.Required(str, unique=True)
         jira_issues = orm.Set("JiraIssues")
-        queries = orm.Required(orm.Json)
+        # queries = orm.Required(orm.Json)
+
+        def __init__(self, queries: dict[str, str], **kwargs: Any) -> None:
+            """
+            Initialize the Products class.
+
+            Args:
+                queries (dict): A dictionary of queries
+            """
+            super().__init__(**kwargs)
+            self.queries = queries
 
         @classmethod
         @orm.db_session
