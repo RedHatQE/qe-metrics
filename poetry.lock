@@ -1061,12 +1061,12 @@ dev = ["pre-commit", "pytest-asyncio", "tox"]
 
 [[package]]
 name = "python-simple-logger"
-version = "1.0.17"
+version = "1.0.18"
 description = "A simple logger for python"
 optional = false
-python-versions = ">=3.8,<4.0"
+python-versions = "<4.0,>=3.8"
 files = [
-    {file = "python_simple_logger-1.0.17.tar.gz", hash = "sha256:187d04637e83737dd49e0bba4785933d7ab3eb8b96b85acd826e0a17e34f47d2"},
+    {file = "python_simple_logger-1.0.18.tar.gz", hash = "sha256:0e3693986f230f6bd8acd09c757af29760e92ecb25c28924f948f96f0a8ebdcc"},
 ]
 
 [package.dependencies]
