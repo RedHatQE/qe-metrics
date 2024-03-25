@@ -12,25 +12,12 @@ def db_session():
 
 @pytest.fixture(scope="module")
 def tmp_sqlite_db(tmp_db_config) -> Database:
-    """
-    Setup and teardown a temporary SQLite database for testing.
-
-    Yields:
-        Database: Database object
-    """
-
     with Database(config_file=tmp_db_config, verbose=False) as database:
         yield database
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def tmp_db_config(tmp_path_factory) -> str:
-    """
-    Setup and teardown a temporary database credentials file for testing.
-
-    Yields:
-        str: Temporary database credentials file path
-    """
     tmp_dir = tmp_path_factory.mktemp(basename="qe-metrics-test")
 
     config = {
@@ -46,18 +33,22 @@ def tmp_db_config(tmp_path_factory) -> str:
 
 
 @pytest.fixture
-def service(db_session, tmp_sqlite_db, request):
-    return tmp_sqlite_db.Services(name=request.param)
+def tmp_products_file(tmp_path, request):
+    products = request.param
+    products_file = tmp_path / "products.yaml"
+    with open(products_file, "w") as tmp_products:
+        yaml.dump(products, tmp_products)
+    yield products_file
 
 
 @pytest.fixture
-def jira_issue(db_session, tmp_sqlite_db, service, request):
-    """
-    Setup a JiraIssues entry for testing.
+def product(db_session, tmp_sqlite_db, request):
+    product_name, queries = request.param
+    return tmp_sqlite_db.Products(name=product_name, queries=queries)
 
-    Yields:
-        JiraIssues: JiraIssues object
-    """
+
+@pytest.fixture
+def jira_issue(db_session, tmp_sqlite_db, product, request):
     with orm.db_session:
-        jira_issue = tmp_sqlite_db.JiraIssues(service=service, **request.param)
+        jira_issue = tmp_sqlite_db.JiraIssues(product=product, **request.param)
         yield jira_issue

@@ -1,12 +1,13 @@
 import os
 from types import TracebackType
-from typing import Optional, Type
+from typing import Optional, Type, List, Any
 
 from datetime import date
 from pony import orm
 from pyaml_env import parse_config
 from simple_logger.logger import get_logger
-from qe_metrics.utils.general import verify_config
+
+from qe_metrics.utils.general import verify_config, verify_queries
 
 
 class Database:
@@ -66,14 +67,49 @@ class Database:
             provider=self.db_config.get("provider", "postgres"),
         )
 
-    class Services(DB_CONNECTION.Entity):  # type: ignore
+    class Products(DB_CONNECTION.Entity):  # type: ignore
         """
-        A class to represent the Services table in the database.
+        A class to represent the Products table in the database.
         """
 
         id = orm.PrimaryKey(int, auto=True)
         name = orm.Required(str, unique=True)
         jira_issues = orm.Set("JiraIssues")
+
+        def __init__(self, queries: dict[str, str], **kwargs: Any) -> None:
+            """
+            Initialize the Products class.
+
+            Args:
+                queries (dict): A dictionary of queries
+            """
+            super().__init__(**kwargs)
+            self.queries = queries
+
+        @classmethod
+        @orm.db_session
+        def from_file(cls, products_file: str) -> List["Database.Products"]:
+            """
+            Initialize the Products class from a file. Create new entries if they do not exist. Update the queries if
+            they are modified.
+
+            Args:
+                products_file (str): Path to the yaml file holding product names and their queries
+
+            Returns:
+                List["Database.Products"]: A list of Products objects
+            """
+            products_dict = parse_config(products_file)
+            products = []
+            for name, queries in products_dict.items():
+                verify_queries(queries_dict=queries)
+                if not (product := cls.get(name=name)):
+                    products.append(cls(name=name, queries=queries))
+                else:
+                    setattr(product, "queries", queries)
+                    products.append(product)
+            orm.commit()
+            return products
 
     class JiraIssues(DB_CONNECTION.Entity):  # type: ignore
         """
@@ -81,7 +117,7 @@ class Database:
         """
 
         id = orm.PrimaryKey(int, auto=True)
-        service = orm.Required("Services")
+        product = orm.Required("Products")
         issue_key = orm.Required(str, unique=True)
         title = orm.Required(str)
         url = orm.Required(str)

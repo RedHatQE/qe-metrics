@@ -2,7 +2,7 @@
 
 Queries Jira and stores results in a database for further analysis in Grafana.
 
-<!-- TODO: Add step-by-step instructions for adding a service to the regular execution of this tool -->
+<!-- TODO: Add step-by-step instructions for adding a product to the regular execution of this tool -->
 
 ## Configuration
 
@@ -50,7 +50,31 @@ Optional values:
 - `token`: The API token used to authenticate with the Jira server.
 - `server`: The FQDN or IP of the Jira server. Must include the protocol (e.g. `https://`).
 
-<!-- TODO: Add configuration details for services and queries -->
+### Products and Queries
+
+The qe-metrics tool uses a YAML file passed to it using the `--products-file` option as its source of products and queries.
+The file should hold a list of defined products, each with a list of Jira queries to be executed. Here is an example of a products file:
+
+```yaml
+some_product:
+  blocker: "project = 'PRODUCT' AND resolution = Unresolved AND Issuetype = bug AND priority = blocker"
+  critical-blocker: "project = 'PRODUCT' AND resolution = Unresolved AND Issuetype = bug AND priority = blocker AND labels = 'critical'"
+another_product:
+  blocker: "project = 'PRODUCT2' AND resolution = Unresolved AND Issuetype = bug AND priority = blocker"
+  critical-blocker: "project = 'PRODUCT2' AND resolution = Unresolved AND Issuetype = bug AND priority = blocker AND labels = 'critical'"
+```
+
+The example above defines two "products", `some_product` and `another_product`, each with two queries. The queries have a
+"severity" of `blocker` and `critical-blocker`. The queries are written in [Jira Query Language (JQL)](https://support.atlassian.com/jira-software-cloud/docs/use-advanced-search-with-jira-query-language-jql/)
+and are used to define which issues should be associated with the `product` and `severity` in the database.
+
+#### Severity
+
+The severity of a query is used to define the severity of the issues returned by the query. Currently, the following
+severities are supported:
+
+- `blocker`
+- `critical-blocker`
 
 <!-- TODO: Add DB schema and explanation -->
 

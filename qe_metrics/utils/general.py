@@ -22,3 +22,29 @@ def verify_config(config: dict[str, Any], required_keys: list[str]) -> None:
 
     if none_values_keys := [key for key in required_keys if config.get(key) is None]:
         raise ValueError(f"The following keys have None values: {' '.join(none_values_keys)}")
+
+
+def verify_queries(queries_dict: dict[str, str]) -> None:
+    """
+    Verify that the required queries are present.
+
+    The required queries values are not None in the queries' dictionary.Also verify that there are no other queries other
+    than the ones in required_queries.
+
+    Args:
+        queries_dict (dict[str, str]): Dictionary holding the queries.
+
+    Raises:
+        ValueError: If any of the required queries are missing or the required queries values are None in the queries' dictionary.
+                    If there are any queries that are not in the required_queries list.
+    """
+    required_queries = ["blocker", "critical-blocker"]
+
+    if missing_queries := [query for query in required_queries if query not in queries_dict]:
+        raise ValueError(f"Missing queries in the products file: {' '.join(missing_queries)}")
+
+    if none_values_queries := [query for query in required_queries if queries_dict.get(query) is None]:
+        raise ValueError(f"The following queries have None values: {' '.join(none_values_queries)}")
+
+    if extra_queries := [query for query in queries_dict if query not in required_queries]:
+        raise ValueError(f"Extra queries in the products file: {' '.join(extra_queries)}")
