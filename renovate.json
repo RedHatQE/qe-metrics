@@ -1,0 +1,1 @@
+{"$schema": "https://docs.renovatebot.com/renovate-schema.json", "packageRules": [{"matchPackagePatterns": ["click", "jira", "jinja2", "python-simple-logger", "psycopg2-binary", "pony", "pyaml-env", "ipdb", "tox", "pre-commit", "pytest", "pytest-cov", "pytest-mock", "ipython"], "groupName": "poetry-deps"}]}
