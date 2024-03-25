@@ -2,12 +2,21 @@ import os
 from types import TracebackType
 from typing import Optional, Type, List, Any
 
-from datetime import date
+from datetime import date, datetime
+
+from jira import Issue
 from pony import orm
 from pyaml_env import parse_config
 from simple_logger.logger import get_logger
 
 from qe_metrics.utils.general import verify_config, verify_queries
+from qe_metrics.utils.issue_utils import (
+    check_customer_escaped,
+    check_is_bug,
+    format_issue_date,
+    update_existing_issue,
+    check_issue_fields_changed,
+)
 
 
 class Database:
@@ -87,7 +96,6 @@ class Database:
             self.queries = queries
 
         @classmethod
-        @orm.db_session
         def from_file(cls, products_file: str) -> List["Database.Products"]:
             """
             Initialize the Products class from a file. Create new entries if they do not exist. Update the queries if
@@ -118,7 +126,7 @@ class Database:
 
         id = orm.PrimaryKey(int, auto=True)
         product = orm.Required("Products")
-        issue_key = orm.Required(str, unique=True)
+        issue_key = orm.Required(str)
         title = orm.Required(str)
         url = orm.Required(str)
         project = orm.Required(str)
@@ -127,3 +135,43 @@ class Database:
         customer_escaped = orm.Required(bool)
         date_created = orm.Required(date)
         last_updated = orm.Required(date)
+        date_record_modified = orm.Required(datetime, default=datetime.now)
+
+        @classmethod
+        def create_update_issues(
+            cls, issues: List[Issue], product: "Database.Products", severity: str, jira_server: str
+        ) -> None:
+            """
+            Initialize the JiraIssues class from a list of Jira issues.
+
+            Args:
+                issues (List[Issue]): A list of Jira issues
+                product (Database.Products): A product object
+                severity (str): Severity of the issues
+                jira_server (str): Jira server URL
+
+            Returns:
+                List["Database.JiraIssues"]: A list of JiraIssues objects
+            """
+            for issue in issues:
+                if not check_is_bug(issue=issue):
+                    continue
+
+                existing_issue = cls.get(issue_key=issue.key, product=product)
+                if existing_issue and check_issue_fields_changed(existing_issue, issue, severity, jira_server):
+                    update_existing_issue(existing_issue, issue, severity, jira_server)
+                elif not existing_issue:
+                    cls(
+                        product=product,
+                        issue_key=issue.key,
+                        title=issue.fields.summary,
+                        url=f"{jira_server}/browse/{issue.key}",
+                        project=issue.fields.project.key,
+                        severity=severity,
+                        status=issue.fields.status.name,
+                        customer_escaped=check_customer_escaped(issue=issue),
+                        date_created=format_issue_date(issue.fields.created),
+                        last_updated=format_issue_date(issue.fields.updated),
+                    )
+
+            orm.commit()
