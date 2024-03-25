@@ -26,8 +26,10 @@ def verify_config(config: dict[str, Any], required_keys: list[str]) -> None:
 
 def verify_queries(queries_dict: dict[str, str]) -> None:
     """
-    Verify that the required queries are present and the required queries values are not None in the queries' dictionary.
-    Also verify that there are no other queries other than the ones in required_queries.
+    Verify that the required queries are present.
+
+    The required queries values are not None in the queries' dictionary.Also verify that there are no other queries other
+    than the ones in required_queries.
 
     Args:
         queries_dict (dict[str, str]): Dictionary holding the queries.
