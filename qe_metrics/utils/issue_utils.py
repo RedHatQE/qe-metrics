@@ -1,11 +1,10 @@
-# TODO: Write unit tests for the functions in this file
 from __future__ import annotations
 from datetime import date, datetime, timedelta
 
 from jira import Issue
 
 from simple_logger.logger import get_logger
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 
 if TYPE_CHECKING:
     from qe_metrics.libs.database import Database
@@ -29,6 +28,7 @@ def check_customer_escaped(issue: Issue) -> bool:
         return False
 
 
+# TODO: Write unit tests or delete
 def check_created_date(issue: Issue, days: int) -> bool:
     """
     Check if the issue was created in the last X days.
@@ -41,19 +41,6 @@ def check_created_date(issue: Issue, days: int) -> bool:
         bool: True if the issue was created in the last X days, False otherwise.
     """
     return (datetime.now().date() - format_issue_date(issue.fields.created)) <= timedelta(days=days)
-
-
-def check_is_bug(issue: Issue) -> bool:
-    """
-    Check if the issue is a bug.
-
-    Args:
-        issue (Issue): Jira Issue
-
-    Returns:
-        bool: True if the issue is a bug, False otherwise.
-    """
-    return issue.fields.issuetype.name.lower() == "bug"
 
 
 def format_issue_date(date_str: str) -> date:
@@ -69,49 +56,52 @@ def format_issue_date(date_str: str) -> date:
     return datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S.%f%z").date()
 
 
-def check_issue_fields_changed(
-    existing_issue: "Database.JiraIssues", issue: Issue, severity: str, jira_server: str
-) -> bool:
+def update_existing_issue(existing_issue: "Database.JiraIssues", issue: Issue, severity: str) -> "Database.JiraIssues":
     """
-    Check if any of the fields of an existing issue have changed.
+    Check if any of the fields of an existing issue have changed and update them if they have.
 
     Args:
         existing_issue (Database.JiraIssues): Existing issue from the database
         issue (Issue): New issue from Jira
         severity (str): Severity assigned to the issue/query
-        jira_server (str): Jira server URL
 
     Returns:
-        bool: True if any field has changed, False otherwise
+        Database.JiraIssues: Updated issue object
     """
-    return (
-        existing_issue.title.strip() != issue.fields.summary.strip()
-        or existing_issue.url != f"{jira_server}/browse/{issue.key}"
-        or existing_issue.project != issue.fields.project.key
-        or existing_issue.severity != severity
-        or existing_issue.status != issue.fields.status.name
-        or existing_issue.customer_escaped != check_customer_escaped(issue=issue)
-        or existing_issue.last_updated != format_issue_date(issue.fields.updated)
-    )
+    fields = [
+        ("title", issue.fields.summary.strip()),
+        ("severity", severity),
+        ("status", issue.fields.status.name),
+        ("customer_escaped", check_customer_escaped(issue=issue)),
+        ("last_updated", format_issue_date(issue.fields.updated)),
+    ]
+    for field, new_value in fields:
+        if (current_value := getattr(existing_issue, field)) != new_value:
+            LOGGER.info(
+                f'Updating issue "{issue.key}" in database: "{field}" changed from "{current_value}" to "{new_value}"'
+            )
+            setattr(existing_issue, field, new_value)
+            existing_issue.date_record_modified = datetime.now()
+
+    return existing_issue
 
 
-def update_existing_issue(existing_issue: "Database.JiraIssues", issue: Issue, severity: str, jira_server: str) -> None:
+def delete_stale_issues(
+    current_issues: List[Issue], db_issues: List["Database.JiraIssues"], product: "Database.Products"
+) -> None:
     """
-    Update the fields of an existing issue if they have changed.
+    Delete JiraIssues items in the database that are not in the current list of issues.
 
     Args:
-        existing_issue (Database.JiraIssues): Existing issue from the database
-        issue (Issue): New issue from Jira
-        severity (str): Severity assigned to the issue/query
-        jira_server (str): Jira server URL
+        current_issues (List[Issue]): A list of current Jira issues for a product.
+        db_issues ("Database.JiraIssues"): A list of JiraIssues objects already in the database.
+        product (Database.Products): The product object to which the issues belong.
     """
-    LOGGER.info(f'Updating issue "{issue.key}" in database')
+    current_issue_keys = {issue.key for issue in current_issues}
+    db_issue_keys = {db_issue.issue_key for db_issue in db_issues if db_issue.product.name == product.name}
+    stale_issue_keys = db_issue_keys - current_issue_keys
 
-    existing_issue.title = issue.fields.summary
-    existing_issue.url = f"{jira_server}/browse/{issue.key}"
-    existing_issue.project = issue.fields.project.key
-    existing_issue.severity = severity
-    existing_issue.status = issue.fields.status.name
-    existing_issue.customer_escaped = check_customer_escaped(issue=issue)
-    existing_issue.last_updated = format_issue_date(issue.fields.updated)
-    existing_issue.date_record_modified = datetime.now()
+    for db_issue in db_issues:
+        if db_issue.issue_key in stale_issue_keys:
+            LOGGER.info(f'Deleting stale issue "{db_issue.issue_key}" for product {product.name} from database')
+            db_issue.delete()

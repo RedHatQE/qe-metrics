@@ -12,10 +12,9 @@ from simple_logger.logger import get_logger
 from qe_metrics.utils.general import verify_config, verify_queries
 from qe_metrics.utils.issue_utils import (
     check_customer_escaped,
-    check_is_bug,
     format_issue_date,
     update_existing_issue,
-    check_issue_fields_changed,
+    delete_stale_issues,
 )
 
 
@@ -142,7 +141,7 @@ class Database:
             cls, issues: List[Issue], product: "Database.Products", severity: str, jira_server: str
         ) -> None:
             """
-            Initialize the JiraIssues class from a list of Jira issues.
+            Create or update JiraIssues items in the database from a list of Jira issues.
 
             Args:
                 issues (List[Issue]): A list of Jira issues
@@ -153,14 +152,12 @@ class Database:
             Returns:
                 List["Database.JiraIssues"]: A list of JiraIssues objects
             """
+            issues = [_issue for _issue in issues if _issue.fields.issuetype.name.lower() == "bug"]
             for issue in issues:
-                if not check_is_bug(issue=issue):
-                    continue
-
                 existing_issue = cls.get(issue_key=issue.key, product=product)
-                if existing_issue and check_issue_fields_changed(existing_issue, issue, severity, jira_server):
-                    update_existing_issue(existing_issue, issue, severity, jira_server)
-                elif not existing_issue:
+                if existing_issue:
+                    update_existing_issue(existing_issue, issue, severity)
+                else:
                     cls(
                         product=product,
                         issue_key=issue.key,
@@ -174,4 +171,7 @@ class Database:
                         last_updated=format_issue_date(issue.fields.updated),
                     )
 
+            delete_stale_issues(
+                current_issues=issues, db_issues=cls.select(product=product, severity=severity), product=product
+            )
             orm.commit()
