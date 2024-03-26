@@ -48,7 +48,7 @@ class Database:
     ) -> None:
         if self.DB_CONNECTION:
             self.DB_CONNECTION.disconnect()
-            self.logger.info("Disconnected from the database")
+            self.logger.success("Disconnected from the database")
 
     def bind_local_db_connection(self) -> None:
         """

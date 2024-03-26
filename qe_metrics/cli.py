@@ -35,20 +35,16 @@ from qe_metrics.libs.jira import Jira
 def main(products_file: str, config_file: str, pdb: bool, verbose_db: bool) -> None:
     """Gather QE Metrics"""
 
-    with Database(config_file=config_file, verbose=verbose_db) as database:
-        jira = Jira(config_file=config_file)
-        products = database.Products.from_file(products_file=products_file)
-
-        if jira.connection:
-            for product in products:
-                for severity, query in product.queries.items():
-                    _logger.info(f'Executing Jira query for "{product.name}" with severity "{severity}"')
-                    database.JiraIssues.create_update_issues(
-                        issues=jira.search(query=query),
-                        product=product,
-                        severity=severity,
-                        jira_server=jira.jira_config["server"],
-                    )
+    with Database(config_file=config_file, verbose=verbose_db) as database, Jira(config_file=config_file) as jira:
+        for product in database.Products.from_file(products_file=products_file):
+            for severity, query in product.queries.items():
+                _logger.info(f'Executing Jira query for "{product.name}" with severity "{severity}"')
+                database.JiraIssues.create_update_issues(
+                    issues=jira.search(query=query),
+                    product=product,
+                    severity=severity,
+                    jira_server=jira.jira_config["server"],
+                )
 
     # TODO: Run a cleanup of the database to remove old entries
 

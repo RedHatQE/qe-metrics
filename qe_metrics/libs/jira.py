@@ -20,6 +20,20 @@ class Jira:
         self.jira_config = parse_config(config_file)["jira"]
         self._connection = None
 
+    def __enter__(self) -> "Jira":
+        self._connection = self.connection
+        return self
+
+    def __exit__(
+        self,
+        exc_type: Any,
+        exc_value: Any,
+        traceback: Any,
+    ) -> None:
+        if self._connection:
+            self._connection.close()
+            self.logger.success("Disconnected from Jira")
+
     @property
     def connection(self) -> JIRA:
         """
