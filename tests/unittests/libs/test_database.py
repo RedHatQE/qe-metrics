@@ -14,30 +14,32 @@ def test_database_products_entry(tmp_sqlite_db, product):
 
 
 @pytest.mark.parametrize(
-    "product, jira_issue",
+    "product, jira_issues",
     [
         pytest.param(
             ("test-jira-entry-product", {"blocker": "BLOCKER QUERY", "critical-blocker": "CRITICAL BLOCKER QUERY"}),
-            {
-                "issue_key": "TEST-1234",
-                "title": "Test Issue",
-                "url": "https://jira.com",
-                "project": "TEST",
-                "severity": "blocker",
-                "status": "Open",
-                "customer_escaped": False,
-                "date_created": "2024-01-01",
-                "last_updated": "2024-01-01",
-            },
+            [
+                {
+                    "issue_key": "TEST-1234",
+                    "title": "Test Issue",
+                    "url": "https://jira.com",
+                    "project": "TEST",
+                    "severity": "blocker",
+                    "status": "Open",
+                    "customer_escaped": False,
+                    "date_created": "2024-01-01",
+                    "last_updated": "2024-01-01",
+                }
+            ],
         )
     ],
     indirect=True,
 )
-def test_database_jira_issues_entry(tmp_sqlite_db, product, jira_issue):
+def test_database_jira_issues_entry(tmp_sqlite_db, product, jira_issues):
     all_jira_issues = tmp_sqlite_db.JiraIssues.select()
-    assert jira_issue.issue_key in [
+    assert jira_issues[0].issue_key in [
         _issue.issue_key for _issue in all_jira_issues
-    ], f"Test Jira issue {jira_issue.issue_key} not found in database."
+    ], f"Test Jira issue {jira_issues[0].issue_key} not found in database."
 
 
 @pytest.mark.parametrize(
