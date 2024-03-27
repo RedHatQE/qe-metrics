@@ -76,6 +76,13 @@ severities are supported:
 - `blocker`
 - `critical-blocker`
 
-<!-- TODO: Add DB schema and explanation -->
+
+## Database Schema
+
+The supporting database for the tool consists of two tables -- `jiraissues` and `products`.
+
+![Database Schema](docs/img/db-schema.png)
+
+Because the tool makes use of an [object relational mapper](https://docs.ponyorm.org/), the tables are created by the tool if they are not already present in the database when the tool is executed. If this tool is being used with a new database, it is recommended to allow the tool to create the tables.
 
 <!-- TODO: Add outline of how CI will work -->
