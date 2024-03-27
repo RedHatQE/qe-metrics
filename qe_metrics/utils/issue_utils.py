@@ -1,5 +1,5 @@
 from __future__ import annotations
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 
 from jira import Issue
 
@@ -26,21 +26,6 @@ def check_customer_escaped(issue: Issue) -> bool:
         return float(issue.fields.customfield_12313440) > 0
     except (ValueError, AttributeError):
         return False
-
-
-# TODO: Write unit tests or delete
-def check_created_date(issue: Issue, days: int) -> bool:
-    """
-    Check if the issue was created in the last X days.
-
-    Args:
-        issue (Issue): Jira Issue
-        days (int): Number of days
-
-    Returns:
-        bool: True if the issue was created in the last X days, False otherwise.
-    """
-    return (datetime.now().date() - format_issue_date(issue.fields.created)) <= timedelta(days=days)
 
 
 def format_issue_date(date_str: str) -> date:

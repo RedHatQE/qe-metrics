@@ -39,6 +39,8 @@ def main(products_file: str, config_file: str, pdb: bool, verbose_db: bool) -> N
     with Database(config_file=config_file, verbose=verbose_db) as database, Jira(
         config_file=config_file
     ) as jira, orm.db_session:
+        # TODO: Run a cleanup of the database to remove old entries
+
         for product in database.Products.from_file(products_file=products_file):
             for severity, query in product.queries.items():
                 _logger.info(f'Executing Jira query for "{product.name}" with severity "{severity}"')
@@ -48,8 +50,6 @@ def main(products_file: str, config_file: str, pdb: bool, verbose_db: bool) -> N
                     severity=severity,
                     jira_server=jira.jira_config["server"],
                 )
-
-    # TODO: Run a cleanup of the database to remove old entries
 
 
 if __name__ == "__main__":
