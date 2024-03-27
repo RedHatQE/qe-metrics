@@ -2,6 +2,7 @@ import os
 import sys
 
 import click
+from pony import orm
 
 from simple_logger.logger import get_logger
 from qe_metrics.libs.database import Database
@@ -35,7 +36,7 @@ from qe_metrics.libs.jira import Jira
 def main(products_file: str, config_file: str, pdb: bool, verbose_db: bool) -> None:
     """Gather QE Metrics"""
 
-    with Database(config_file=config_file, verbose=verbose_db) as database, Jira(config_file=config_file) as jira:
+    with Database(config_file=config_file, verbose=verbose_db) as database, Jira(config_file=config_file) as jira, orm.db_session:
         for product in database.Products.from_file(products_file=products_file):
             for severity, query in product.queries.items():
                 _logger.info(f'Executing Jira query for "{product.name}" with severity "{severity}"')
