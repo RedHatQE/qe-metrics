@@ -17,8 +17,20 @@ class Jira:
             config_file (str): Path to the yaml file holding database and Jira configuration.
         """
         self.logger = get_logger(name=self.__class__.__module__)
-
         self.jira_config = parse_config(config_file)["jira"]
+
+    def __enter__(self) -> "Jira":
+        return self
+
+    def __exit__(
+        self,
+        exc_type: Any,
+        exc_value: Any,
+        traceback: Any,
+    ) -> None:
+        if self.connection:
+            self.connection.close()
+            self.logger.success("Disconnected from Jira")
 
     @property
     def connection(self) -> JIRA:
@@ -50,5 +62,5 @@ class Jira:
         try:
             return self.connection.search_issues(query, maxResults=False)
         except JIRAError as error:
-            self.logger.error(f"Failed to execute Jira query: {error}")
+            self.logger.error(f'Failed to execute Jira query "{query}": {error}')
             raise click.Abort()
