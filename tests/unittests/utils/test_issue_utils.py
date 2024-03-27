@@ -3,7 +3,7 @@ from qe_metrics.utils.issue_utils import (
     check_customer_escaped,
     format_issue_date,
     update_existing_issue,
-    delete_stale_issues,
+    delete_closed_issues,
 )
 
 import pytest
@@ -123,7 +123,7 @@ def test_format_issue_date(raw_jira_issues):
     "product, raw_jira_issues, jira_issues",
     [
         pytest.param(
-            ("delete-stale-issues-product", {"blocker": "BLOCKER QUERY", "critical-blocker": "CRITICAL BLOCKER QUERY"}),
+            ("delet-closed-issues-product", {"blocker": "BLOCKER QUERY", "critical-blocker": "CRITICAL BLOCKER QUERY"}),
             [
                 {
                     "key": "TEST-1234",
@@ -168,7 +168,7 @@ def test_format_issue_date(raw_jira_issues):
     ],
     indirect=True,
 )
-def test_delete_stale_issues(tmp_sqlite_db, product, raw_jira_issues, jira_issues):
-    delete_stale_issues(current_issues=raw_jira_issues, db_issues=jira_issues, product=product)
+def test_delete_closed_issues(tmp_sqlite_db, product, raw_jira_issues, jira_issues):
+    delete_closed_issues(current_issues=raw_jira_issues, db_issues=jira_issues, product=product)
     for issue in tmp_sqlite_db.JiraIssues.select():
         assert issue.issue_key != "TEST-1235"

@@ -71,7 +71,7 @@ def update_existing_issue(existing_issue: "Database.JiraIssues", issue: Issue, s
     return existing_issue
 
 
-def delete_stale_issues(
+def delete_closed_issues(
     current_issues: List[Issue], db_issues: List["Database.JiraIssues"], product: "Database.Products"
 ) -> None:
     """
@@ -84,9 +84,9 @@ def delete_stale_issues(
     """
     current_issue_keys = {issue.key for issue in current_issues}
     db_issue_keys = {db_issue.issue_key for db_issue in db_issues if db_issue.product.name == product.name}
-    stale_issue_keys = db_issue_keys - current_issue_keys
+    closed_issue_keys = db_issue_keys - current_issue_keys
 
     for db_issue in db_issues:
-        if db_issue.issue_key in stale_issue_keys:
-            LOGGER.info(f'Deleting stale issue "{db_issue.issue_key}" for product {product.name} from database')
+        if db_issue.issue_key in closed_issue_keys:
+            LOGGER.info(f'Deleting closed issue "{db_issue.issue_key}" for product {product.name} from database')
             db_issue.delete()

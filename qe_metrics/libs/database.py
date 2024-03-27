@@ -14,7 +14,7 @@ from qe_metrics.utils.issue_utils import (
     check_customer_escaped,
     format_issue_date,
     update_existing_issue,
-    delete_stale_issues,
+    delete_closed_issues,
 )
 
 
@@ -171,7 +171,7 @@ class Database:
                         last_updated=format_issue_date(issue.fields.updated),
                     )
 
-            delete_stale_issues(
+            delete_closed_issues(
                 current_issues=issues, db_issues=cls.select(product=product, severity=severity), product=product
             )
             orm.commit()
