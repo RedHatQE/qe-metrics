@@ -40,7 +40,6 @@ class Jira:
         Returns:
             JIRA: Jira connection
         """
-
         verify_config(config=self.jira_config, required_keys=["token", "server"])
         try:
             connection = JIRA(server=self.jira_config["server"], token_auth=self.jira_config["token"])
