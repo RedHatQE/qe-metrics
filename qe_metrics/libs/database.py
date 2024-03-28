@@ -9,13 +9,7 @@ from pony import orm
 from pyaml_env import parse_config
 from simple_logger.logger import get_logger
 
-from qe_metrics.utils.general import verify_config, verify_queries
-from qe_metrics.utils.issue_utils import (
-    check_customer_escaped,
-    format_issue_date,
-    update_existing_issue,
-    delete_closed_issues,
-)
+from qe_metrics.utils.general import verify_config, verify_queries, format_issue_date
 
 
 class Database:
@@ -30,14 +24,13 @@ class Database:
             verbose (bool): Verbose output of database connection and transactions.
         """
         self.logger = get_logger(name=self.__class__.__module__)
-        orm.set_sql_debug(verbose)
-
+        orm.set_sql_debug(debug=verbose)
         self.config_file = config_file
-        self.db_config = parse_config(self.config_file)["database"]
-        self.bind_local_db_connection() if self.db_config.get("local") else self.bind_remote_db_connection()
-        self.DB_CONNECTION.generate_mapping(create_tables=True)
+        self.db_config = parse_config(path=self.config_file)["database"]
 
     def __enter__(self) -> "Database":
+        self.bind_local_db_connection() if self.db_config.get("local") else self.bind_remote_db_connection()
+        self.DB_CONNECTION.generate_mapping(create_tables=True)
         return self
 
     def __exit__(
@@ -106,7 +99,7 @@ class Database:
             Returns:
                 List["Database.Products"]: A list of Products objects
             """
-            products_dict = parse_config(products_file)
+            products_dict = parse_config(path=products_file)
             products = []
             for name, queries in products_dict.items():
                 verify_queries(queries_dict=queries)
@@ -122,6 +115,8 @@ class Database:
         """
         A class to represent the JiraIssues table in the database.
         """
+
+        logger = get_logger(name=__module__)
 
         id = orm.PrimaryKey(int, auto=True)
         product = orm.Required("Products")
@@ -154,9 +149,8 @@ class Database:
             """
             issues = [_issue for _issue in issues if _issue.fields.issuetype.name.lower() == "bug"]
             for issue in issues:
-                existing_issue = cls.get(issue_key=issue.key, product=product)
-                if existing_issue:
-                    update_existing_issue(existing_issue, issue, severity)
+                if existing_issue := cls.get(issue_key=issue.key, product=product):
+                    existing_issue.update_existing_issue(new_issue_data=issue, severity=severity)
                 else:
                     cls(
                         product=product,
@@ -166,12 +160,59 @@ class Database:
                         project=issue.fields.project.key,
                         severity=severity,
                         status=issue.fields.status.name,
-                        customer_escaped=check_customer_escaped(issue=issue),
+                        customer_escaped=issue.is_customer_escaped,
                         date_created=format_issue_date(issue.fields.created),
                         last_updated=format_issue_date(issue.fields.updated),
                     )
 
-            delete_closed_issues(
+            cls.delete_closed_issues(
                 current_issues=issues, db_issues=cls.select(product=product, severity=severity), product=product
             )
             orm.commit()
+
+        def update_existing_issue(self, new_issue_data: Issue, severity: str) -> None:
+            """
+            Check if any of the fields of an existing issue have changed and update them if they have.
+
+            Args:
+                existing_issue (Database.JiraIssues): Existing issue from the database
+                issue (Issue): New issue from Jira
+                severity (str): Severity assigned to the issue/query
+            """
+            fields = [
+                ("title", new_issue_data.fields.summary.strip()),
+                ("severity", severity),
+                ("status", new_issue_data.fields.status.name),
+                ("customer_escaped", new_issue_data.is_customer_escaped),
+                ("last_updated", format_issue_date(new_issue_data.fields.updated)),
+            ]
+            for field, new_value in fields:
+                if (current_value := getattr(self, field)) != new_value:
+                    self.logger.info(
+                        f'Updating issue "{new_issue_data.key}" in database: "{field}" changed from "{current_value}" to "{new_value}"'
+                    )
+                    setattr(self, field, new_value)
+                    self.date_record_modified = datetime.now()
+
+        @staticmethod
+        def delete_closed_issues(
+            current_issues: List[Issue], db_issues: List["Database.JiraIssues"], product: "Database.Products"
+        ) -> None:
+            """
+            Delete JiraIssues items in the database that are not in the current list of issues.
+
+            Args:
+                current_issues (List[Issue]): A list of current Jira issues for a product.
+                db_issues ("Database.JiraIssues"): A list of JiraIssues objects already in the database.
+                product (Database.Products): The product object to which the issues belong.
+            """
+            current_issue_keys = {issue.key for issue in current_issues}
+            db_issue_keys = {db_issue.issue_key for db_issue in db_issues if db_issue.product.name == product.name}
+            closed_issue_keys = db_issue_keys - current_issue_keys
+
+            for db_issue in db_issues:
+                if db_issue.issue_key in closed_issue_keys:
+                    db_issue.logger.info(
+                        f'Deleting closed issue "{db_issue.issue_key}" for product {product.name} from database'
+                    )
+                    db_issue.delete()
