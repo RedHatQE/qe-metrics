@@ -1,5 +1,3 @@
-from unittest.mock import MagicMock
-
 import pytest
 import yaml
 
@@ -61,14 +59,15 @@ def jira_issues(db_session, tmp_sqlite_db, product, request):
 
 
 @pytest.fixture
-def raw_jira_issues(request):
+def raw_jira_issues(request, mocker):
     issues = []
     for issue in request.param:
-        mock_issue = MagicMock()
+        mock_issue = mocker.MagicMock()
         mock_issue.key = issue["key"]
         mock_issue.fields.summary = issue["title"]
         mock_issue.fields.status.name = issue["status"]
         mock_issue.fields.customfield_12313440 = issue["customer_escaped"]
+        mock_issue.is_customer_escaped = float(getattr(mock_issue.fields, "customfield_12313440")) > 0
         mock_issue.fields.updated = issue["last_updated"]
         issues.append(mock_issue)
     yield issues
