@@ -1,4 +1,4 @@
-FROM docker.io/library/python:3.12-slim
+FROM docker.io/library/python:3.11-slim
 
 COPY pyproject.toml poetry.lock /qe-metrics/
 COPY qe_metrics /qe-metrics/qe_metrics
