@@ -165,5 +165,4 @@ def test_update_existing_issue(product, raw_jira_issues, jira_issues):
 )
 def test_mark_stale_issues(tmp_sqlite_db, product, raw_jira_issues, jira_issues):
     Database.JiraIssues.mark_stale_issues(current_issues=raw_jira_issues, db_issues=jira_issues, product=product)
-    issue = tmp_sqlite_db.JiraIssues.get(lambda issue: issue.issue_key == "TEST-1235")
-    assert issue.status == "stale"
+    assert tmp_sqlite_db.JiraIssues.get(lambda issue: issue.issue_key == "TEST-1235").status == "stale"
