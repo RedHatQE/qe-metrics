@@ -1,4 +1,5 @@
 from typing import Any
+from datetime import datetime, date
 
 from simple_logger.logger import get_logger
 
@@ -48,3 +49,16 @@ def verify_queries(queries_dict: dict[str, str]) -> None:
 
     if extra_queries := [query for query in queries_dict if query not in required_queries]:
         raise ValueError(f"Extra queries in the products file: {' '.join(extra_queries)}")
+
+
+def format_issue_date(date_str: str) -> date:
+    """
+    Format the date in the format YYYY-MM-DD.
+
+    Args:
+        date_str (str): Date string from Jira.Issue
+
+    Returns:
+        date: Date object for database insertion
+    """
+    return datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S.%f%z").date()
