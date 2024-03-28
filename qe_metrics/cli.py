@@ -44,12 +44,15 @@ def main(products_file: str, config_file: str, pdb: bool, verbose_db: bool) -> N
         for product in database.Products.from_file(products_file=products_file):
             for severity, query in product.queries.items():
                 _logger.info(f'Executing Jira query for "{product.name}" with severity "{severity}"')
-                database.JiraIssues.create_update_issues(
-                    issues=jira.search(query=query),
-                    product=product,
-                    severity=severity,
-                    jira_server=jira.jira_config["server"],
-                )
+                try:
+                    database.JiraIssues.create_update_issues(
+                        issues=jira.search(query=query),
+                        product=product,
+                        severity=severity,
+                        jira_server=jira.jira_config["server"],
+                    )
+                except Exception as ex:
+                    _logger.error(f'Failed to update issues for "{product.name}" with severity "{severity}": {ex}')
 
 
 if __name__ == "__main__":
