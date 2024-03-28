@@ -116,7 +116,7 @@ def test_update_existing_issue(product, raw_jira_issues, jira_issues):
     [
         pytest.param(
             (
-                "delete-closed-issues-product",
+                "mark-stale-issues-product",
                 {"blocker": "BLOCKER QUERY", "critical-blocker": "CRITICAL BLOCKER QUERY"},
             ),
             [
@@ -163,7 +163,7 @@ def test_update_existing_issue(product, raw_jira_issues, jira_issues):
     ],
     indirect=True,
 )
-def test_delete_closed_issues(tmp_sqlite_db, product, raw_jira_issues, jira_issues):
-    Database.JiraIssues.delete_closed_issues(current_issues=raw_jira_issues, db_issues=jira_issues, product=product)
-    for issue in tmp_sqlite_db.JiraIssues.select():
-        assert issue.issue_key != "TEST-1235"
+def test_mark_stale_issues(tmp_sqlite_db, product, raw_jira_issues, jira_issues):
+    Database.JiraIssues.mark_stale_issues(current_issues=raw_jira_issues, db_issues=jira_issues, product=product)
+    issue = tmp_sqlite_db.JiraIssues.get(lambda issue: issue.issue_key == "TEST-1235")
+    assert issue.status == "stale"

@@ -165,7 +165,7 @@ class Database:
                         last_updated=format_issue_date(issue.fields.updated),
                     )
 
-            cls.delete_closed_issues(
+            cls.mark_stale_issues(
                 current_issues=issues, db_issues=cls.select(product=product, severity=severity), product=product
             )
             orm.commit()
@@ -195,11 +195,11 @@ class Database:
                     self.date_record_modified = datetime.now()
 
         @staticmethod
-        def delete_closed_issues(
+        def mark_stale_issues(
             current_issues: List[Issue], db_issues: List["Database.JiraIssues"], product: "Database.Products"
         ) -> None:
             """
-            Delete JiraIssues items in the database that are not in the current list of issues.
+            Mark JiraIssues items as "stale" in the database that are not in the current list of issues.
 
             Args:
                 current_issues (List[Issue]): A list of current Jira issues for a product.
@@ -212,7 +212,5 @@ class Database:
 
             for db_issue in db_issues:
                 if db_issue.issue_key in closed_issue_keys:
-                    db_issue.logger.info(
-                        f'Deleting closed issue "{db_issue.issue_key}" for product {product.name} from database'
-                    )
-                    db_issue.delete()
+                    db_issue.logger.info(f'Marking issue "{db_issue.issue_key}" for product {product.name} as stale')
+                    db_issue.status = "stale"
