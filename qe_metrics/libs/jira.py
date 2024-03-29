@@ -47,6 +47,7 @@ class Jira:
         verify_config(config=self.jira_config, required_keys=["token", "server"])
         try:
             connection = JIRA(server=self.jira_config["server"], token_auth=self.jira_config["token"])
+            connection.my_permissions()
             self.logger.success(f'Successfully authenticated to Jira server {self.jira_config["server"]}')
             return connection
         except JIRAError as error:
