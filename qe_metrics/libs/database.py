@@ -211,6 +211,6 @@ class Database:
             closed_issue_keys = db_issue_keys - current_issue_keys
 
             for db_issue in db_issues:
-                if db_issue.issue_key in closed_issue_keys:
+                if db_issue.issue_key in closed_issue_keys and db_issue.status != 'stale':
                     db_issue.logger.info(f'Marking issue "{db_issue.issue_key}" for product {product.name} as stale')
                     db_issue.status = "stale"
