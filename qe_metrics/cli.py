@@ -8,6 +8,7 @@ from simple_logger.logger import get_logger
 from qe_metrics.libs.database import Database
 from qe_metrics.libs.jira import Jira
 
+LOGGER = get_logger(name="main-qe-metrics")
 
 @click.command()
 @click.option(
@@ -43,7 +44,7 @@ def main(products_file: str, config_file: str, pdb: bool, verbose_db: bool) -> N
 
         for product in database.Products.from_file(products_file=products_file):
             for severity, query in product.queries.items():
-                _logger.info(f'Executing Jira query for "{product.name}" with severity "{severity}"')
+                LOGGER.info(f'Executing Jira query for "{product.name}" with severity "{severity}"')
                 try:
                     database.JiraIssues.create_update_issues(
                         issues=jira.search(query=query),
@@ -52,12 +53,11 @@ def main(products_file: str, config_file: str, pdb: bool, verbose_db: bool) -> N
                         jira_server=jira.jira_config["server"],
                     )
                 except Exception as ex:
-                    _logger.error(f'Failed to update issues for "{product.name}" with severity "{severity}": {ex}')
+                    LOGGER.error(f'Failed to update issues for "{product.name}" with severity "{severity}": {ex}')
 
 
 if __name__ == "__main__":
     should_raise = False
-    _logger = get_logger(name="main-qe-metrics")
     try:
         main()
     except Exception as ex:
@@ -71,7 +71,7 @@ if __name__ == "__main__":
             traceback.print_exc()
             ipdb.post_mortem(tb)
         else:
-            _logger.error(ex)
+            LOGGER.error(ex)
             should_raise = True
 
     finally:
