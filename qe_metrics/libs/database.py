@@ -13,8 +13,8 @@ from qe_metrics.utils.general import verify_config, verify_queries, format_issue
 
 DB_CONNECTION = orm.Database()
 
-class Database:
 
+class Database:
     def __init__(self, config_file: str, verbose: bool) -> None:
         """
         Initialize the Database class
@@ -49,9 +49,7 @@ class Database:
         """
         sqlite_filepath = self.db_config.get("local_filepath", "/tmp/qe_metrics.sqlite")
         self.logger.info(f"Local database connection enabled, using SQLite database at {sqlite_filepath}")
-        DB_CONNECTION.bind(
-            provider="sqlite", filename=sqlite_filepath, create_db=not os.path.exists(sqlite_filepath)
-        )
+        DB_CONNECTION.bind(provider="sqlite", filename=sqlite_filepath, create_db=not os.path.exists(sqlite_filepath))
 
     def bind_remote_db_connection(self) -> None:
         """
@@ -211,6 +209,6 @@ class Database:
             closed_issue_keys = db_issue_keys - current_issue_keys
 
             for db_issue in db_issues:
-                if db_issue.issue_key in closed_issue_keys and db_issue.status != 'stale':
+                if db_issue.issue_key in closed_issue_keys and db_issue.status != "stale":
                     db_issue.logger.info(f'Marking issue "{db_issue.issue_key}" for product {product.name} as stale')
                     db_issue.status = "stale"

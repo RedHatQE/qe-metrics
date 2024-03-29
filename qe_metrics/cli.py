@@ -10,6 +10,7 @@ from qe_metrics.libs.jira import Jira
 
 LOGGER = get_logger(name="main-qe-metrics")
 
+
 @click.command()
 @click.option(
     "--products-file",
