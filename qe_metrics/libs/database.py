@@ -28,6 +28,7 @@ class Database:
         self.config_file = config_file
         self.db_config = parse_config(path=self.config_file)["database"]
 
+
     def __enter__(self) -> "Database":
         self.bind_local_db_connection() if self.db_config.get("local") else self.bind_remote_db_connection()
         DB_CONNECTION.generate_mapping(create_tables=True)
