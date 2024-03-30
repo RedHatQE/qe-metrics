@@ -36,7 +36,7 @@ Download = "https://github.com/RedHatQE/qe-metrics"
 
 [tool.poetry.dependencies]
 # 3.12 to be added following completion of https://github.com/ponyorm/pony/issues/703
-python = ">=3.8,<3.12"
+python = ">=3.12,<3.13"
 click = "^8.1.7"
 jira = "^3.5.2"
 jinja2 = "^3.1.2"
