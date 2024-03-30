@@ -18,7 +18,7 @@ class Jira:
         """
         self.logger = get_logger(name=self.__class__.__module__)
 
-        self.jira_config = parse_config(config_file)["jira"]
+        self.jira_config = parse_config(path=config_file)["jira"]
 
     @property
     def connection(self) -> JIRA:
@@ -48,7 +48,7 @@ class Jira:
             list[Any]: List of Jira issues returned from the query.
         """
         try:
-            return self.connection.search_issues(query, maxResults=False)
+            return self.connection.search_issues(jql_str=query, maxResults=False)
         except JIRAError as error:
             self.logger.error(f"Failed to execute Jira query: {error}")
             raise click.Abort()

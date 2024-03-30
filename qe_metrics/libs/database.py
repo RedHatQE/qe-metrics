@@ -25,7 +25,7 @@ class Database:
         orm.set_sql_debug(verbose)
 
         self.config_file = config_file
-        self.db_config = parse_config(self.config_file)["database"]
+        self.db_config = parse_config(path=self.config_file)["database"]
         self.bind_local_db_connection() if self.db_config.get("local") else self.bind_remote_db_connection()
         self.DB_CONNECTION.generate_mapping(create_tables=True)
 
@@ -99,7 +99,7 @@ class Database:
             Returns:
                 List["Database.Products"]: A list of Products objects
             """
-            products_dict = parse_config(products_file)
+            products_dict = parse_config(path=products_file)
             products = []
             for name, queries in products_dict.items():
                 verify_queries(queries_dict=queries)
