@@ -2,6 +2,8 @@ import pytest
 import yaml
 
 from qe_metrics.libs.database import Database
+from qe_metrics.libs.orm_database import ProductsEntity
+from qe_metrics.libs.orm_database import JiraIssuesEntity
 from pony import orm
 
 
@@ -45,7 +47,7 @@ def tmp_products_file(tmp_path, request):
 @pytest.fixture
 def product(db_session, tmp_sqlite_db, request):
     product_name, queries = request.param
-    return tmp_sqlite_db.Products(name=product_name, queries=queries)
+    return ProductsEntity(name=product_name, queries=queries)
 
 
 @pytest.fixture
@@ -53,7 +55,7 @@ def jira_issues(db_session, tmp_sqlite_db, product, request):
     jira_issues = []
     with orm.db_session:
         for issue in request.param:
-            jira_issue = tmp_sqlite_db.JiraIssues(product=product, **issue)
+            jira_issue = JiraIssuesEntity(product=product, **issue)
             jira_issues.append(jira_issue)
         yield jira_issues
 

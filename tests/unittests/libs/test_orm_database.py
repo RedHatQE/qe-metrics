@@ -1,19 +1,6 @@
 import datetime
 import pytest
-
-from qe_metrics.libs.database import Database
-
-
-@pytest.mark.parametrize(
-    "product",
-    [("test-product-entry-product", {"blocker": "BLOCKER QUERY", "critical-blocker": "CRITICAL BLOCKER QUERY"})],
-    indirect=True,
-)
-def test_database_products_entry(tmp_sqlite_db, product):
-    all_products = tmp_sqlite_db.Products.select()
-    assert product.name in [
-        _product.name for _product in all_products
-    ], f"Test product {product.name} not found in database."
+from qe_metrics.libs.orm_database import JiraIssuesEntity, ProductsEntity
 
 
 @pytest.mark.parametrize(
@@ -39,23 +26,10 @@ def test_database_products_entry(tmp_sqlite_db, product):
     indirect=True,
 )
 def test_database_jira_issues_entry(tmp_sqlite_db, product, jira_issues):
-    all_jira_issues = tmp_sqlite_db.JiraIssues.select()
+    all_jira_issues = JiraIssuesEntity.select()
     assert jira_issues[0].issue_key in [
         _issue.issue_key for _issue in all_jira_issues
     ], f"Test Jira issue {jira_issues[0].issue_key} not found in database."
-
-
-@pytest.mark.parametrize(
-    "tmp_products_file",
-    [{"test-from-file-product": {"blocker": "BLOCKER QUERY", "critical-blocker": "CRITICAL BLOCKER QUERY"}}],
-    indirect=True,
-)
-def test_database_products_from_file(tmp_sqlite_db, tmp_products_file, db_session):
-    tmp_sqlite_db.Products.from_file(products_file=tmp_products_file)
-    all_products = tmp_sqlite_db.Products.select()
-    assert "test-from-file-product" in [
-        _product.name for _product in all_products
-    ], "Test product test-from-file-product not found in database."
 
 
 @pytest.mark.parametrize(
@@ -164,5 +138,30 @@ def test_update_existing_issue(product, raw_jira_issues, jira_issues):
     indirect=True,
 )
 def test_mark_stale_issues(tmp_sqlite_db, product, raw_jira_issues, jira_issues):
-    Database.JiraIssues.mark_stale_issues(current_issues=raw_jira_issues, db_issues=jira_issues, product=product)
-    assert tmp_sqlite_db.JiraIssues.get(lambda issue: issue.issue_key == "TEST-1235").status == "stale"
+    JiraIssuesEntity.mark_stale_issues(current_issues=raw_jira_issues, db_issues=jira_issues, product=product)
+    assert JiraIssuesEntity.get(lambda issue: issue.issue_key == "TEST-1235").status == "stale"
+
+
+@pytest.mark.parametrize(
+    "product",
+    [("test-product-entry-product", {"blocker": "BLOCKER QUERY", "critical-blocker": "CRITICAL BLOCKER QUERY"})],
+    indirect=True,
+)
+def test_database_products_entry(tmp_sqlite_db, product):
+    all_products = ProductsEntity.select()
+    assert product.name in [
+        _product.name for _product in all_products
+    ], f"Test product {product.name} not found in database."
+
+
+@pytest.mark.parametrize(
+    "tmp_products_file",
+    [{"test-from-file-product": {"blocker": "BLOCKER QUERY", "critical-blocker": "CRITICAL BLOCKER QUERY"}}],
+    indirect=True,
+)
+def test_database_products_from_file(tmp_sqlite_db, tmp_products_file):
+    ProductsEntity.from_file(products_file=tmp_products_file)
+    all_products = ProductsEntity.select()
+    assert "test-from-file-product" in [
+        _product.name for _product in all_products
+    ], "Test product test-from-file-product not found in database."
