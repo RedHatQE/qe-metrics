@@ -14,7 +14,7 @@ class JiraIssuesEntity(DB_CONNECTION.Entity):
     A class to represent the JiraIssues table in the database.
     """
 
-    _table_ = "JiraIssues"
+    _table_ = "jiraissues"
 
     logger = get_logger(name=__module__)
 
@@ -60,7 +60,7 @@ class ProductsEntity(DB_CONNECTION.Entity):
     A class to represent the Products table in the database.
     """
 
-    _table_ = "Products"
+    _table_ = "products"
 
     id = orm.PrimaryKey(int, auto=True)
     name = orm.Required(str, unique=True)
