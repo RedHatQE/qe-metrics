@@ -3,6 +3,7 @@ import pytest
 from qe_metrics.libs.orm_database import JiraIssuesEntity, ProductsEntity
 from qe_metrics.libs.database import update_existing_issue, mark_stale_issues, products_from_file, create_update_issues
 
+
 @pytest.mark.parametrize(
     "product, raw_jira_issues, jira_issues",
     [
@@ -103,6 +104,7 @@ def test_database_mark_stale_issues(product, raw_jira_issues, jira_issues):
     mark_stale_issues(current_issues=raw_jira_issues, db_issues=jira_issues, product=product)
     assert JiraIssuesEntity.get(lambda issue: issue.issue_key == "TEST-1135").status == "stale"
 
+
 @pytest.mark.parametrize(
     "tmp_products_file",
     [{"test-from-file-product": {"blocker": "BLOCKER QUERY", "critical-blocker": "CRITICAL BLOCKER QUERY"}}],
@@ -114,6 +116,7 @@ def test_database_products_from_file(tmp_products_file):
     assert "test-from-file-product" in [
         _product.name for _product in all_products
     ], "Test product test-from-file-product not found in database."
+
 
 @pytest.mark.parametrize(
     "product, raw_jira_issues",
@@ -130,7 +133,6 @@ def test_database_products_from_file(tmp_products_file):
                     "customer_escaped": "1.0",
                 },
             ],
-            
         ),
     ],
     indirect=True,
@@ -155,7 +157,6 @@ def test_database_create_update_issues_creates_issues(product, raw_jira_issues):
                     "issue_type": "Task",
                 },
             ],
-            
         ),
     ],
     indirect=True,
