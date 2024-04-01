@@ -5,10 +5,8 @@ import click
 from pony import orm
 
 from simple_logger.logger import get_logger
-from qe_metrics.libs.database import Database
+from qe_metrics.libs.database import Database, create_update_issues, products_from_file
 from qe_metrics.libs.jira import Jira
-from qe_metrics.libs.orm_database import ProductsEntity
-from qe_metrics.libs.orm_database import JiraIssuesEntity
 
 LOGGER = get_logger(name="main-qe-metrics")
 
@@ -43,11 +41,11 @@ def main(products_file: str, config_file: str, pdb: bool, verbose_db: bool) -> N
     with Database(config_file=config_file, verbose=verbose_db), Jira(config_file=config_file) as jira, orm.db_session:
         # TODO: Run a cleanup of the database to remove old entries
 
-        for product in ProductsEntity.from_file(products_file=products_file):
+        for product in products_from_file(products_file=products_file):
             for severity, query in product.queries.items():
                 LOGGER.info(f'Executing Jira query for "{product.name}" with severity "{severity}"')
                 try:
-                    JiraIssuesEntity.create_update_issues(
+                    create_update_issues(
                         issues=jira.search(query=query),
                         product=product,
                         severity=severity,
