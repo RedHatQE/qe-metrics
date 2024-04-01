@@ -74,15 +74,13 @@ def test_verify_queries_with_extra_queries_raises_value_error(queries_extra):
     [
         [
             {
-                "key": "TEST-1234",
+                "key": "TEST-3234",
                 "title": "New Test Summary",
-                "status": "In Progress",
-                "customer_escaped": "0.0",
-                "last_updated": "2023-12-31T23:59:59.999999+0000",
+                "last_updated": "2023-01-31T23:59:59.999999+0000",
             }
         ]
     ],
     indirect=True,
 )
 def test_format_issue_date(raw_jira_issues):
-    assert format_issue_date(raw_jira_issues[0].fields.updated) == date(2023, 12, 31)
+    assert format_issue_date(raw_jira_issues[0].fields.updated) == date(2023, 1, 31)

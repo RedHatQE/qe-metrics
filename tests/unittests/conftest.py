@@ -66,10 +66,13 @@ def raw_jira_issues(request, mocker):
     for issue in request.param:
         mock_issue = mocker.MagicMock()
         mock_issue.key = issue["key"]
+        mock_issue.fields.project.key = issue["key"].split("-")[0]
         mock_issue.fields.summary = issue["title"]
-        mock_issue.fields.status.name = issue["status"]
-        mock_issue.fields.customfield_12313440 = issue["customer_escaped"]
+        mock_issue.fields.status.name = issue.get("status", "In Progress")
+        mock_issue.fields.issuetype.name = issue.get("issue_type", "bug")
+        mock_issue.fields.customfield_12313440 = issue.get("customer_escaped", "0.0")
         mock_issue.is_customer_escaped = float(getattr(mock_issue.fields, "customfield_12313440")) > 0
-        mock_issue.fields.updated = issue["last_updated"]
+        mock_issue.fields.updated = issue.get("last_updated", "2023-12-31T23:59:59.999999+0000")
+        mock_issue.fields.created = issue.get("created", "2023-12-31T23:59:59.999999+0000")
         issues.append(mock_issue)
     yield issues
