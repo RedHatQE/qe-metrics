@@ -6,7 +6,7 @@ from qe_metrics.libs.database_mapping import JiraIssuesEntity, ProductsEntity
     "product, jira_issues",
     [
         pytest.param(
-            ("test-jira-entry-product", {"blocker": "BLOCKER QUERY", "critical-blocker": "CRITICAL BLOCKER QUERY"}),
+            ("test-jira-entry-product"),
             [
                 {
                     "issue_key": "TEST-1234",
@@ -33,7 +33,7 @@ def test_database_jira_issues_entry(product, jira_issues):
 
 @pytest.mark.parametrize(
     "product",
-    [("test-product-entry-product", {"blocker": "BLOCKER QUERY", "critical-blocker": "CRITICAL BLOCKER QUERY"})],
+    [("test-product-entry-product")],
     indirect=True,
 )
 def test_database_products_entry(product):

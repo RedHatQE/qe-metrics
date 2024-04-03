@@ -2,7 +2,6 @@ from pony import orm
 from datetime import date
 
 from simple_logger.logger import get_logger
-from typing import Any
 
 
 DB_OBJECT: orm.Database = orm.Database()
@@ -40,7 +39,3 @@ class ProductsEntity(DB_OBJECT.Entity):
     id = orm.PrimaryKey(int, auto=True)
     name = orm.Required(str, unique=True)
     jira_issues = orm.Set("JiraIssuesEntity")
-
-    def __init__(self, queries: dict[str, str], **kwargs: Any) -> None:
-        super().__init__(**kwargs)
-        self.queries = queries

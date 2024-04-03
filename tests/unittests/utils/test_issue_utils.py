@@ -13,10 +13,7 @@ from qe_metrics.utils.issue_utils import (
     "product, raw_jira_issues, jira_issues",
     [
         pytest.param(
-            (
-                "update-existing-issue-product",
-                {"blocker": "BLOCKER QUERY", "critical-blocker": "CRITICAL BLOCKER QUERY"},
-            ),
+            ("update-existing-issue-product"),
             [
                 {
                     "key": "TEST-1234",
@@ -63,10 +60,7 @@ def test_database_update_existing_issue(product, raw_jira_issues, jira_issues):
     "product, raw_jira_issues, jira_issues",
     [
         pytest.param(
-            (
-                "mark-obsolete-issues-product",
-                {"blocker": "BLOCKER QUERY", "critical-blocker": "CRITICAL BLOCKER QUERY"},
-            ),
+            ("mark-obsolete-issues-product"),
             [
                 {
                     "key": "TEST-1134",
@@ -114,10 +108,7 @@ def test_database_mark_obsolete_issues(product, raw_jira_issues, jira_issues):
     "product, raw_jira_issues",
     [
         pytest.param(
-            (
-                "create-update-issues-product",
-                {"blocker": "BLOCKER QUERY", "critical-blocker": "CRITICAL BLOCKER QUERY"},
-            ),
+            ("create-update-issues-product"),
             [
                 {
                     "key": "NEW-1234",
@@ -138,10 +129,7 @@ def test_database_create_update_issues_creates_issues(product, raw_jira_issues):
     "product, raw_jira_issues",
     [
         pytest.param(
-            (
-                "create-update-issues-none_bugs_not_created_product",
-                {"blocker": "BLOCKER QUERY", "critical-blocker": "CRITICAL BLOCKER QUERY"},
-            ),
+            ("create-update-issues-none_bugs_not_created_product"),
             [
                 {
                     "key": "TASK-1234",

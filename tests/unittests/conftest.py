@@ -45,8 +45,8 @@ def tmp_products_file(tmp_path, request):
 
 @pytest.fixture
 def product(db_session, tmp_sqlite_db, request):
-    product_name, queries = request.param
-    return ProductsEntity(name=product_name, queries=queries)
+    product_name = request.param
+    return ProductsEntity(name=product_name)
 
 
 @pytest.fixture

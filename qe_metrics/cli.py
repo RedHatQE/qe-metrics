@@ -43,8 +43,9 @@ def main(products_file: str, config_file: str, pdb: bool, verbose_db: bool) -> N
     with Database(config_file=config_file, verbose=verbose_db), Jira(config_file=config_file) as jira, orm.db_session:
         # TODO: Run a cleanup of the database to remove old entries
 
-        for product in products_from_file(products_file=products_file):
-            for severity, query in product.queries.items():
+        for product_dict in products_from_file(products_file=products_file):
+            product, queries = product_dict.values()
+            for severity, query in queries.items():
                 LOGGER.info(f'Executing Jira query for "{product.name}" with severity "{severity}"')
                 try:
                     create_update_issues(
