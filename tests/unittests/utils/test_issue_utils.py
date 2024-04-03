@@ -1,7 +1,12 @@
-from datetime import datetime, date
+from datetime import date
 import pytest
 from qe_metrics.libs.database_mapping import JiraIssuesEntity
-from qe_metrics.utils.issue_utils import update_existing_issue, mark_obsolete_issues, create_update_issues, format_issue_date
+from qe_metrics.utils.issue_utils import (
+    update_existing_issue,
+    mark_obsolete_issues,
+    create_update_issues,
+    format_issue_date,
+)
 
 
 @pytest.mark.parametrize(
@@ -151,6 +156,7 @@ def test_database_create_update_issues_creates_issues(product, raw_jira_issues):
 def test_database_create_update_issues_none_bugs_not_created(product, raw_jira_issues):
     create_update_issues(issues=raw_jira_issues, product=product, severity="blocker", jira_server="https://jira.com")
     assert not JiraIssuesEntity.get(issue_key="TASK-1234", product=product)
+
 
 @pytest.mark.parametrize(
     "raw_jira_issues",

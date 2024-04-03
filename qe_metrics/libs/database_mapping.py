@@ -1,7 +1,6 @@
 from pony import orm
-from datetime import date, datetime
+from datetime import date
 
-from jira import Issue
 from simple_logger.logger import get_logger
 from typing import Any
 

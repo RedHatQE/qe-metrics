@@ -4,6 +4,7 @@ from pyaml_env import parse_config
 from pony import orm
 from qe_metrics.utils.general import verify_queries
 
+
 def products_from_file(products_file: str) -> List["ProductsEntity"]:
     """
     Initialize the ProductsEntity class from a file. Create new entries if they do not exist. Update the queries if

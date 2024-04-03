@@ -1,4 +1,3 @@
-
 from datetime import datetime, date
 from pony import orm
 from typing import List
@@ -7,6 +6,7 @@ from qe_metrics.libs.database_mapping import ProductsEntity, JiraIssuesEntity
 from simple_logger.logger import get_logger
 
 LOGGER = get_logger(name=__name__)
+
 
 def format_issue_date(date_str: str) -> date:
     """
