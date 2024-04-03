@@ -5,8 +5,10 @@ import click
 from pony import orm
 
 from simple_logger.logger import get_logger
-from qe_metrics.libs.database import Database, create_update_issues, products_from_file
+from qe_metrics.libs.database import Database
 from qe_metrics.libs.jira import Jira
+from qe_metrics.utils.issue_utils import create_update_issues
+from qe_metrics.utils.product_utils import products_from_file
 
 LOGGER = get_logger(name="main-qe-metrics")
 

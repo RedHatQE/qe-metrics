@@ -1,5 +1,5 @@
 import pytest
-from qe_metrics.libs.orm_database import JiraIssuesEntity, ProductsEntity
+from qe_metrics.libs.database_mapping import JiraIssuesEntity, ProductsEntity
 
 
 @pytest.mark.parametrize(

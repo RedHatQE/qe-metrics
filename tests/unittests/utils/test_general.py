@@ -1,6 +1,5 @@
 import pytest
-from qe_metrics.utils.general import verify_config, verify_queries, format_issue_date
-from datetime import date
+from qe_metrics.utils.general import verify_queries, verify_config
 
 
 @pytest.fixture
@@ -67,20 +66,3 @@ def test_verify_queries_with_none_values_raises_value_error(queries_none_value):
 def test_verify_queries_with_extra_queries_raises_value_error(queries_extra):
     with pytest.raises(ValueError):
         verify_queries(queries_dict=queries_extra)
-
-
-@pytest.mark.parametrize(
-    "raw_jira_issues",
-    [
-        [
-            {
-                "key": "TEST-3234",
-                "title": "New Test Summary",
-                "last_updated": "2023-01-31T23:59:59.999999+0000",
-            }
-        ]
-    ],
-    indirect=True,
-)
-def test_format_issue_date(raw_jira_issues):
-    assert format_issue_date(raw_jira_issues[0].fields.updated) == date(2023, 1, 31)

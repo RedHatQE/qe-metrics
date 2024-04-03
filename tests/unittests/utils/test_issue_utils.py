@@ -1,7 +1,7 @@
-import datetime
+from datetime import datetime, date
 import pytest
-from qe_metrics.libs.orm_database import JiraIssuesEntity, ProductsEntity
-from qe_metrics.libs.database import update_existing_issue, mark_stale_issues, products_from_file, create_update_issues
+from qe_metrics.libs.database_mapping import JiraIssuesEntity
+from qe_metrics.utils.issue_utils import update_existing_issue, mark_obsolete_issues, create_update_issues, format_issue_date
 
 
 @pytest.mark.parametrize(
@@ -42,7 +42,7 @@ def test_database_update_existing_issue(product, raw_jira_issues, jira_issues):
         "severity": "critical",
         "status": "In Progress",
         "customer_escaped": False,
-        "last_updated": datetime.date(2023, 12, 31),
+        "last_updated": date(2023, 12, 31),
     }
     actual_values = {
         "title": jira_issues[0].title,
@@ -51,7 +51,7 @@ def test_database_update_existing_issue(product, raw_jira_issues, jira_issues):
         "customer_escaped": jira_issues[0].customer_escaped,
         "last_updated": jira_issues[0].last_updated,
     }
-    assert actual_values == expected_values, f"{actual_values} != {expected_values}"
+    assert actual_values == expected_values, f"actual: {actual_values} != expected: {expected_values}"
 
 
 @pytest.mark.parametrize(
@@ -59,7 +59,7 @@ def test_database_update_existing_issue(product, raw_jira_issues, jira_issues):
     [
         pytest.param(
             (
-                "mark-stale-issues-product",
+                "mark-obsolete-issues-product",
                 {"blocker": "BLOCKER QUERY", "critical-blocker": "CRITICAL BLOCKER QUERY"},
             ),
             [
@@ -100,22 +100,9 @@ def test_database_update_existing_issue(product, raw_jira_issues, jira_issues):
     ],
     indirect=True,
 )
-def test_database_mark_stale_issues(product, raw_jira_issues, jira_issues):
-    mark_stale_issues(current_issues=raw_jira_issues, db_issues=jira_issues, product=product)
-    assert JiraIssuesEntity.get(lambda issue: issue.issue_key == "TEST-1135").status == "stale"
-
-
-@pytest.mark.parametrize(
-    "tmp_products_file",
-    [{"test-from-file-product": {"blocker": "BLOCKER QUERY", "critical-blocker": "CRITICAL BLOCKER QUERY"}}],
-    indirect=True,
-)
-def test_database_products_from_file(tmp_products_file):
-    products_from_file(products_file=tmp_products_file)
-    all_products = ProductsEntity.select()
-    assert "test-from-file-product" in [
-        _product.name for _product in all_products
-    ], "Test product test-from-file-product not found in database."
+def test_database_mark_obsolete_issues(product, raw_jira_issues, jira_issues):
+    mark_obsolete_issues(current_issues=raw_jira_issues, db_issues=jira_issues, product=product)
+    assert JiraIssuesEntity.get(lambda issue: issue.issue_key == "TEST-1135").status == "obsolete"
 
 
 @pytest.mark.parametrize(
@@ -164,3 +151,19 @@ def test_database_create_update_issues_creates_issues(product, raw_jira_issues):
 def test_database_create_update_issues_none_bugs_not_created(product, raw_jira_issues):
     create_update_issues(issues=raw_jira_issues, product=product, severity="blocker", jira_server="https://jira.com")
     assert not JiraIssuesEntity.get(issue_key="TASK-1234", product=product)
+
+@pytest.mark.parametrize(
+    "raw_jira_issues",
+    [
+        [
+            {
+                "key": "TEST-3234",
+                "title": "New Test Summary",
+                "last_updated": "2023-01-31T23:59:59.999999+0000",
+            }
+        ]
+    ],
+    indirect=True,
+)
+def test_format_issue_date(raw_jira_issues):
+    assert format_issue_date(raw_jira_issues[0].fields.updated) == date(2023, 1, 31)

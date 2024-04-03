@@ -2,8 +2,7 @@ import pytest
 import yaml
 
 from qe_metrics.libs.database import Database
-from qe_metrics.libs.orm_database import ProductsEntity
-from qe_metrics.libs.orm_database import JiraIssuesEntity
+from qe_metrics.libs.database_mapping import ProductsEntity, JiraIssuesEntity
 from pony import orm
 
 
