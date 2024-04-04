@@ -7,6 +7,8 @@ from simple_logger.logger import get_logger
 
 LOGGER = get_logger(name=__name__)
 
+OBSOLETE_STR = "obsolete"
+
 
 def format_issue_date(date_str: str) -> date:
     """
@@ -39,9 +41,9 @@ def mark_obsolete_issues(
     closed_issue_keys = db_issue_keys - current_issue_keys
 
     for db_issue in db_issues:
-        if db_issue.issue_key in closed_issue_keys and db_issue.status != "obsolete":
-            db_issue.logger.info(f'Marking issue "{db_issue.issue_key}" for product {product.name} as obsolete')
-            db_issue.status = "obsolete"
+        if db_issue.issue_key in closed_issue_keys and db_issue.status != OBSOLETE_STR:
+            db_issue.logger.info(f'Marking issue "{db_issue.issue_key}" for product {product.name} as {OBSOLETE_STR}')
+            db_issue.status = OBSOLETE_STR
 
 
 def update_existing_issue(existing_issue: JiraIssuesEntity, new_issue_data: Issue, severity: str) -> None:
@@ -72,7 +74,7 @@ def create_update_issues(
     issues: List[Issue],
     product: "ProductsEntity",
     severity: str,
-    jira_server: str,  # type: ignore  # noqa: F821
+    jira_server: str,
 ) -> None:
     """
     Create or update JiraIssuesEntity items in the database from a list of Jira issues.
