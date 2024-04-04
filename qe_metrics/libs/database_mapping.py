@@ -1,8 +1,6 @@
 from pony import orm
 from datetime import date
 
-from simple_logger.logger import get_logger
-
 
 DB_OBJECT: orm.Database = orm.Database()
 
@@ -13,8 +11,6 @@ class JiraIssuesEntity(DB_OBJECT.Entity):
     """
 
     _table_ = "jiraissues"
-
-    logger = get_logger(name=__module__)
 
     id = orm.PrimaryKey(int, auto=True)
     product = orm.Required("ProductsEntity")

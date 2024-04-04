@@ -42,8 +42,9 @@ def mark_obsolete_issues(
 
     for db_issue in db_issues:
         if db_issue.issue_key in closed_issue_keys and db_issue.status != OBSOLETE_STR:
-            db_issue.logger.info(f'Marking issue "{db_issue.issue_key}" for product {product.name} as {OBSOLETE_STR}')
+            LOGGER.info(f'Marking issue "{db_issue.issue_key}" for product {product.name} as {OBSOLETE_STR}')
             db_issue.status = OBSOLETE_STR
+    orm.commit()
 
 
 def update_existing_issue(existing_issue: JiraIssuesEntity, new_issue_data: Issue, severity: str) -> None:
@@ -68,6 +69,7 @@ def update_existing_issue(existing_issue: JiraIssuesEntity, new_issue_data: Issu
                 f'Updating issue "{new_issue_data.key}" in database: "{field}" changed from "{current_value}" to "{new_value}"'
             )
             setattr(existing_issue, field, new_value)
+    orm.commit()
 
 
 def create_update_issues(
@@ -77,7 +79,7 @@ def create_update_issues(
     jira_server: str,
 ) -> None:
     """
-    Create or update JiraIssuesEntity items in the database from a list of Jira issues.
+    Create or update JiraIssuesEntity items in the database from a list of Jira issues. Sets status of obselete issues as "obselete".
 
     Args:
         issues (List[Issue]): A list of Jira issues
