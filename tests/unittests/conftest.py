@@ -1,6 +1,8 @@
 import pytest
 import yaml
+
 from qe_metrics.libs.database import Database
+from qe_metrics.libs.database_mapping import ProductsEntity, JiraIssuesEntity
 from pony import orm
 
 
@@ -10,20 +12,20 @@ def db_session():
         yield
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def tmp_sqlite_db(tmp_db_config) -> Database:
     with Database(config_file=tmp_db_config, verbose=False) as database:
         yield database
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def tmp_db_config(tmp_path_factory) -> str:
     tmp_dir = tmp_path_factory.mktemp(basename="qe-metrics-test")
 
     config = {
         "database": {
             "local": True,
-            "local_filepath": str(tmp_dir / "qe_metrics_test.sqlite"),
+            "local_filepath": ":memory:",
         }
     }
 
@@ -43,12 +45,33 @@ def tmp_products_file(tmp_path, request):
 
 @pytest.fixture
 def product(db_session, tmp_sqlite_db, request):
-    product_name, queries = request.param
-    return tmp_sqlite_db.Products(name=product_name, queries=queries)
+    product_name = request.param
+    return ProductsEntity(name=product_name)
 
 
 @pytest.fixture
-def jira_issue(db_session, tmp_sqlite_db, product, request):
+def jira_issues(db_session, tmp_sqlite_db, product, request):
+    jira_issues = []
     with orm.db_session:
-        jira_issue = tmp_sqlite_db.JiraIssues(product=product, **request.param)
-        yield jira_issue
+        for issue in request.param:
+            jira_issue = JiraIssuesEntity(product=product, **issue)
+            jira_issues.append(jira_issue)
+        yield jira_issues
+
+
+@pytest.fixture
+def raw_jira_issues(request, mocker):
+    issues = []
+    for issue in request.param:
+        mock_issue = mocker.MagicMock()
+        mock_issue.key = issue["key"]
+        mock_issue.fields.project.key = issue["key"].split("-")[0]
+        mock_issue.fields.summary = issue["title"]
+        mock_issue.fields.status.name = issue.get("status", "In Progress")
+        mock_issue.fields.issuetype.name = issue.get("issue_type", "bug")
+        mock_issue.fields.customfield_12313440 = issue.get("customer_escaped", "0.0")
+        mock_issue.is_customer_escaped = float(getattr(mock_issue.fields, "customfield_12313440")) > 0
+        mock_issue.fields.updated = issue.get("last_updated", "2023-12-31T23:59:59.999999+0000")
+        mock_issue.fields.created = issue.get("created", "2023-12-31T23:59:59.999999+0000")
+        issues.append(mock_issue)
+    yield issues

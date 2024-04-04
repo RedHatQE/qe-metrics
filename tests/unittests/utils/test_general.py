@@ -1,5 +1,5 @@
 import pytest
-from qe_metrics.utils.general import verify_config, verify_queries
+from qe_metrics.utils.general import verify_queries, verify_config
 
 
 @pytest.fixture

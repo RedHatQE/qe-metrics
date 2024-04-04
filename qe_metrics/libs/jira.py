@@ -1,11 +1,15 @@
 from typing import Any
 
 import click
-from jira import JIRA
+from jira import JIRA, Issue
 from jira.exceptions import JIRAError
 from pyaml_env import parse_config
 from simple_logger.logger import get_logger
 from qe_metrics.utils.general import verify_config
+
+JIRA_CUSTOM_FIELD_MAPPING = {
+    "customer_escaped": "customfield_12313440",
+}
 
 
 class Jira:
@@ -17,11 +21,23 @@ class Jira:
             config_file (str): Path to the yaml file holding database and Jira configuration.
         """
         self.logger = get_logger(name=self.__class__.__module__)
-
         self.jira_config = parse_config(path=config_file)["jira"]
 
-    @property
-    def connection(self) -> JIRA:
+    def __enter__(self) -> "Jira":
+        self.connection = self.connect()
+        return self
+
+    def __exit__(
+        self,
+        exc_type: Any,
+        exc_value: Any,
+        traceback: Any,
+    ) -> None:
+        if self.connection:
+            self.connection.close()
+            self.logger.success("Disconnected from Jira")
+
+    def connect(self) -> JIRA:
         """
         Connect to Jira
 
@@ -31,6 +47,7 @@ class Jira:
         verify_config(config=self.jira_config, required_keys=["token", "server"])
         try:
             connection = JIRA(server=self.jira_config["server"], token_auth=self.jira_config["token"])
+            connection.my_permissions()
             self.logger.success(f'Successfully authenticated to Jira server {self.jira_config["server"]}')
             return connection
         except JIRAError as error:
@@ -48,7 +65,24 @@ class Jira:
             list[Any]: List of Jira issues returned from the query.
         """
         try:
-            return self.connection.search_issues(jql_str=query, maxResults=False)
+            issues = self.connection.search_issues(jql_str=query, maxResults=False)
+            for issue in issues:
+                issue.is_customer_escaped = self.is_customer_escaped(issue=issue)
+            return issues
         except JIRAError as error:
-            self.logger.error(f"Failed to execute Jira query: {error}")
+            self.logger.error(f'Failed to execute Jira query "{query}": {error}')
             raise click.Abort()
+
+    @staticmethod
+    def is_customer_escaped(issue: Issue) -> bool:
+        """
+        Args:
+            issue (Issue): Jira Issue
+
+        Returns:
+            bool: True if the issue is customer escaped, False otherwise.
+        """
+        try:
+            return float(getattr(issue.fields, JIRA_CUSTOM_FIELD_MAPPING["customer_escaped"])) > 0
+        except (TypeError, AttributeError):
+            return False

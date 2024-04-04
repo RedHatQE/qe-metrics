@@ -2,10 +2,15 @@ import os
 import sys
 
 import click
+from pony import orm
 
 from simple_logger.logger import get_logger
 from qe_metrics.libs.database import Database
 from qe_metrics.libs.jira import Jira
+from qe_metrics.utils.issue_utils import create_update_issues
+from qe_metrics.utils.product_utils import products_from_file
+
+LOGGER = get_logger(name="main-qe-metrics")
 
 
 @click.command()
@@ -35,20 +40,26 @@ from qe_metrics.libs.jira import Jira
 def main(products_file: str, config_file: str, pdb: bool, verbose_db: bool) -> None:
     """Gather QE Metrics"""
 
-    # Adding noqa: F841 to ignore the unused variable until next PR, otherwise pre-commit will fail
-    with Database(config_file=config_file, verbose=verbose_db) as database:
-        jira = Jira(config_file=config_file)  # noqa: F841
-        products = database.Products.from_file(products_file=products_file)
-        for product in products:
-            for severity, query in product.queries.items():
-                # TODO: Execute Jira query and populate the database
-                pass  # TODO: Remove this line once the code is implemented
-    # TODO: Run a cleanup of the database to remove old entries
+    with Database(config_file=config_file, verbose=verbose_db), Jira(config_file=config_file) as jira, orm.db_session:
+        # TODO: Run a cleanup of the database to remove old entries
+
+        for product_dict in products_from_file(products_file=products_file):
+            product, queries = product_dict.values()
+            for severity, query in queries.items():
+                LOGGER.info(f'Executing Jira query for "{product.name}" with severity "{severity}"')
+                try:
+                    create_update_issues(
+                        issues=jira.search(query=query),
+                        product=product,
+                        severity=severity,
+                        jira_server=jira.jira_config["server"],
+                    )
+                except Exception as ex:
+                    LOGGER.error(f'Failed to update issues for "{product.name}" with severity "{severity}": {ex}')
 
 
 if __name__ == "__main__":
     should_raise = False
-    _logger = get_logger(name="main-qe-metrics")
     try:
         main()
     except Exception as ex:
@@ -62,7 +73,7 @@ if __name__ == "__main__":
             traceback.print_exc()
             ipdb.post_mortem(tb)
         else:
-            _logger.error(ex)
+            LOGGER.error(ex)
             should_raise = True
 
     finally:
