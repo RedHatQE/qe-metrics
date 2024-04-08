@@ -37,7 +37,7 @@ from qe_metrics.utils.issue_utils import (
     ],
     indirect=True,
 )
-def test_database_update_existing_issue(product, raw_jira_issues, jira_issues):
+def test_update_existing_issue(product, raw_jira_issues, jira_issues):
     update_existing_issue(existing_issue=jira_issues[0], new_issue_data=raw_jira_issues[0], severity="critical")
     expected_values = {
         "title": "New Test Summary",
@@ -99,7 +99,7 @@ def test_database_update_existing_issue(product, raw_jira_issues, jira_issues):
     ],
     indirect=True,
 )
-def test_database_mark_obsolete_issues(product, raw_jira_issues, jira_issues):
+def test_mark_obsolete_issues(product, raw_jira_issues, jira_issues):
     mark_obsolete_issues(current_issues=raw_jira_issues, db_issues=jira_issues, product=product)
     assert JiraIssuesEntity.get(lambda issue: issue.issue_key == "TEST-1135").status == "obsolete"
 
@@ -120,7 +120,7 @@ def test_database_mark_obsolete_issues(product, raw_jira_issues, jira_issues):
     ],
     indirect=True,
 )
-def test_database_create_update_issues_creates_issues(product, raw_jira_issues):
+def test_create_update_issues_creates_issues(product, raw_jira_issues):
     create_update_issues(issues=raw_jira_issues, product=product, severity="blocker", jira_server="https://jira.com")
     assert JiraIssuesEntity.get(issue_key="NEW-1234", product=product)
 
@@ -141,7 +141,7 @@ def test_database_create_update_issues_creates_issues(product, raw_jira_issues):
     ],
     indirect=True,
 )
-def test_database_create_update_issues_none_bugs_not_created(product, raw_jira_issues):
+def test_create_update_issues_none_bugs_not_created(product, raw_jira_issues):
     create_update_issues(issues=raw_jira_issues, product=product, severity="blocker", jira_server="https://jira.com")
     assert not JiraIssuesEntity.get(issue_key="TASK-1234", product=product)
 
