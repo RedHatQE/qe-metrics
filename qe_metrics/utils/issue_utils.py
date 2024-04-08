@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from pony import orm
 from typing import List
 from jira import Issue
@@ -112,3 +112,17 @@ def create_update_issues(
         current_issues=issues, db_issues=JiraIssuesEntity.select(product=product, severity=severity), product=product
     )
     orm.commit()
+
+
+def delete_old_issues(days_old: int):
+    """
+    Delete issues from the database that are older than the specified number of days.
+
+    Args:
+        days_old (int): Number of days old the issues must be to be deleted
+    """
+    LOGGER.info(f"Deleting issues that haven't been updated in {days_old} days from the database")
+    issues = JiraIssuesEntity.select(lambda i: i.last_updated < (datetime.now().date() - timedelta(days=days_old)))
+    [issue.delete() for issue in issues]
+    orm.commit()
+    LOGGER.info(f'Deleted {len(issues)} issues from the database')
