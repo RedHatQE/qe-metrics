@@ -77,12 +77,18 @@ severities are supported:
 - `critical-blocker`
 
 
-## Database Schema
+## Database
+
+### Schema
 
 The supporting database for the tool consists of two tables -- `jiraissues` and `products`.
 
 ![Database Schema](docs/img/db-schema.png)
 
 Because the tool makes use of an [object relational mapper](https://docs.ponyorm.org/), the tables are created by the tool if they are not already present in the database when the tool is executed. If this tool is being used with a new database, it is recommended to allow the tool to create the tables.
+
+### Retention Policy
+
+The tool automatically enforces the database retention policy on every execution. The retention policy is to delete any issue from the qe-metrics database that hasn't been updated (per the "Updated" date in the Jira issues) within 180 days. If an issue hasn't been updated in 180 days and is removed from the database, it will be re-added during the next execution if it has been updated since being removed.
 
 <!-- TODO: Add outline of how CI will work -->
