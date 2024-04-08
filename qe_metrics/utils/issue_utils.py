@@ -8,6 +8,7 @@ from simple_logger.logger import get_logger
 LOGGER = get_logger(name=__name__)
 
 OBSOLETE_STR = "obsolete"
+DATA_RETENTION_DAYS_OLD = 180
 
 
 def format_issue_date(date_str: str) -> date:
@@ -81,6 +82,8 @@ def create_update_issues(
     """
     Create or update JiraIssuesEntity items in the database from a list of Jira issues. Sets status of obselete issues as "obselete".
 
+    Only creates issues if they are of type "bug" and if they are less than DATA_RETENTION_DAYS_OLD days old.
+
     Args:
         issues (List[Issue]): A list of Jira issues
         product (ProductsEntity): A product object
@@ -90,7 +93,13 @@ def create_update_issues(
     Returns:
         List["JiraIssuesEntity"]: A list of JiraIssuesEntity objects
     """
-    issues = [_issue for _issue in issues if _issue.fields.issuetype.name.lower() == "bug"]
+    issues = [
+        _issue
+        for _issue in issues
+        if _issue.fields.issuetype.name.lower() == "bug"
+        and format_issue_date(_issue.fields.updated)
+        >= (datetime.now().date() - timedelta(days=DATA_RETENTION_DAYS_OLD))
+    ]
     for issue in issues:
         if existing_issue := JiraIssuesEntity.get(issue_key=issue.key, product=product):
             update_existing_issue(existing_issue=existing_issue, new_issue_data=issue, severity=severity)
@@ -114,15 +123,15 @@ def create_update_issues(
     orm.commit()
 
 
-def delete_old_issues(days_old: int):
+def delete_old_issues() -> None:
     """
-    Delete issues from the database that are older than the specified number of days.
-
-    Args:
-        days_old (int): Number of days old the issues must be to be deleted
+    Delete issues from the database that are older than DATA_RETENTION_DAYS_OLD days.
     """
-    LOGGER.info(f"Deleting issues that haven't been updated in {days_old} days from the database")
-    issues = JiraIssuesEntity.select(lambda i: i.last_updated < (datetime.now().date() - timedelta(days=days_old)))
+    issues = JiraIssuesEntity.select(
+        lambda _issue: _issue.last_updated < (datetime.now().date() - timedelta(days=DATA_RETENTION_DAYS_OLD))
+    )
+    LOGGER.info(
+        f"Deleting {len(issues)} issues that haven't been updated in {DATA_RETENTION_DAYS_OLD} days from the database"
+    )
     [issue.delete() for issue in issues]
     orm.commit()
-    LOGGER.info(f'Deleted {len(issues)} issues from the database')

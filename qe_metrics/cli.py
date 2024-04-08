@@ -41,7 +41,6 @@ def main(products_file: str, config_file: str, pdb: bool, verbose_db: bool) -> N
     """Gather QE Metrics"""
 
     with Database(config_file=config_file, verbose=verbose_db), Jira(config_file=config_file) as jira, orm.db_session:
-        delete_old_issues(days_old=180)
         for product_dict in products_from_file(products_file=products_file):
             product, queries = product_dict.values()
             for severity, query in queries.items():
@@ -55,6 +54,7 @@ def main(products_file: str, config_file: str, pdb: bool, verbose_db: bool) -> N
                     )
                 except Exception as ex:
                     LOGGER.error(f'Failed to update issues for "{product.name}" with severity "{severity}": {ex}')
+        delete_old_issues()
 
 
 if __name__ == "__main__":
