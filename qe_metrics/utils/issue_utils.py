@@ -127,7 +127,7 @@ def delete_old_issues() -> None:
     """
     Delete issues from the database that are older than DATA_RETENTION_DAYS_OLD days.
     """
-    issues = JiraIssuesEntity.select(
+    issues = JiraIssuesEntity.select(  # noqa: FCN001
         lambda _issue: _issue.last_updated < (datetime.now().date() - timedelta(days=DATA_RETENTION_DAYS_OLD))
     )
     LOGGER.info(
