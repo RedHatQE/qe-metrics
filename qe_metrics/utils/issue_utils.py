@@ -82,8 +82,6 @@ def create_update_issues(
     """
     Create or update JiraIssuesEntity items in the database from a list of Jira issues. Sets status of obselete issues as "obselete".
 
-    Only creates issues if they are of type "bug" and if they are less than DATA_RETENTION_DAYS_OLD days old.
-
     Args:
         issues (List[Issue]): A list of Jira issues
         product (ProductsEntity): A product object
@@ -93,11 +91,7 @@ def create_update_issues(
     Returns:
         List["JiraIssuesEntity"]: A list of JiraIssuesEntity objects
     """
-    issues = [
-        _issue
-        for _issue in issues
-        if _issue.fields.issuetype.name.lower() == "bug"
-    ]
+    issues = [_issue for _issue in issues if _issue.fields.issuetype.name.lower() == "bug"]
     for issue in issues:
         if existing_issue := JiraIssuesEntity.get(issue_key=issue.key, product=product):
             update_existing_issue(existing_issue=existing_issue, new_issue_data=issue, severity=severity)
