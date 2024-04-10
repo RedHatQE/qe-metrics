@@ -8,7 +8,6 @@ from simple_logger.logger import get_logger
 LOGGER = get_logger(name=__name__)
 
 OBSOLETE_STR = "obsolete"
-DATA_RETENTION_DAYS_OLD = 180
 
 
 def format_issue_date(date_str: str) -> date:
