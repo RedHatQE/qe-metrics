@@ -97,8 +97,6 @@ def create_update_issues(
         _issue
         for _issue in issues
         if _issue.fields.issuetype.name.lower() == "bug"
-        and format_issue_date(_issue.fields.updated)
-        >= (datetime.now().date() - timedelta(days=DATA_RETENTION_DAYS_OLD))
     ]
     for issue in issues:
         if existing_issue := JiraIssuesEntity.get(issue_key=issue.key, product=product):
@@ -123,15 +121,16 @@ def create_update_issues(
     orm.commit()
 
 
-def delete_old_issues() -> None:
+def delete_old_issues(days_old: int) -> None:
     """
-    Delete issues from the database that are older than DATA_RETENTION_DAYS_OLD days.
+    Delete issues from the database that were last updated more than the number of days defined in days_old.
+
+    Args:
+        days_old (int): Number of days from the last_updated date to keep issues in the database
     """
     issues = JiraIssuesEntity.select(  # noqa: FCN001
-        lambda _issue: _issue.last_updated < (datetime.now().date() - timedelta(days=DATA_RETENTION_DAYS_OLD))
+        lambda _issue: _issue.last_updated < (datetime.now().date() - timedelta(days=days_old))
     )
-    LOGGER.info(
-        f"Deleting {len(issues)} issues that haven't been updated in {DATA_RETENTION_DAYS_OLD} days from the database"
-    )
+    LOGGER.info(f"Deleting {len(issues)} issues that haven't been updated in {days_old} days from the database")
     [issue.delete() for issue in issues]
     orm.commit()
