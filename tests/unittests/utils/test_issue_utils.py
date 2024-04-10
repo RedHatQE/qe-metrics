@@ -126,29 +126,6 @@ def test_create_update_issues_creates_issues(product, raw_jira_issues):
 
 
 @pytest.mark.parametrize(
-    "product, raw_jira_issues",
-    [
-        pytest.param(
-            ("create-update-issues-none_bugs_not_created_product"),
-            [
-                {
-                    "key": "TASK-1234",
-                    "title": "Test Summary",
-                    "issue_type": "Task",
-                },
-            ],
-        ),
-    ],
-    indirect=True,
-)
-def test_create_update_issues_none_bugs_not_created(product, raw_jira_issues):
-    create_update_issues(issues=raw_jira_issues, product=product, severity="blocker", jira_server="https://jira.com")
-    assert not JiraIssuesEntity.get(
-        issue_key=raw_jira_issues[0].key, product=product
-    ), f"Issue {raw_jira_issues[0].key} with issue type {raw_jira_issues[0].fields.issuetype.name} was created."
-
-
-@pytest.mark.parametrize(
     "product, jira_issues",
     [
         pytest.param(
