@@ -45,4 +45,4 @@ def append_last_updated_arg(query: str, look_back_days: int) -> str:
         LOGGER.error("Query is already using the 'updatedDate' or 'updated' field. Please remove it:\n{query}")
         return query
     else:
-        return query + f' AND updated > "-{look_back_days}d"'
+        return f'{query} AND updated > "-{look_back_days}d"'
