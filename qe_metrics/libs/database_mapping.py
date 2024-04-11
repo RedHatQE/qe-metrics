@@ -20,6 +20,7 @@ class JiraIssuesEntity(DB_OBJECT.Entity):
     project = orm.Required(str)
     severity = orm.Required(str)
     status = orm.Required(str)
+    issue_type = orm.Required(str)
     customer_escaped = orm.Required(bool)
     date_created = orm.Required(date)
     last_updated = orm.Required(date)

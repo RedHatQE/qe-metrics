@@ -15,6 +15,7 @@ from qe_metrics.libs.database_mapping import JiraIssuesEntity, ProductsEntity
                     "project": "TEST",
                     "severity": "blocker",
                     "status": "Open",
+                    "issue_type": "bug",
                     "customer_escaped": False,
                     "date_created": "2024-01-01",
                     "last_updated": "2024-01-01",
