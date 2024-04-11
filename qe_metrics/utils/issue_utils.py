@@ -60,6 +60,7 @@ def update_existing_issue(existing_issue: JiraIssuesEntity, new_issue_data: Issu
         ("title", new_issue_data.fields.summary.strip()),
         ("severity", severity),
         ("status", new_issue_data.fields.status.name),
+        ("issue_type", new_issue_data.fields.issuetype.name.lower()),
         ("customer_escaped", new_issue_data.is_customer_escaped),
         ("last_updated", format_issue_date(new_issue_data.fields.updated)),
     ]
@@ -90,7 +91,6 @@ def create_update_issues(
     Returns:
         List["JiraIssuesEntity"]: A list of JiraIssuesEntity objects
     """
-    issues = [_issue for _issue in issues if _issue.fields.issuetype.name.lower() == "bug"]
     for issue in issues:
         if existing_issue := JiraIssuesEntity.get(issue_key=issue.key, product=product):
             update_existing_issue(existing_issue=existing_issue, new_issue_data=issue, severity=severity)
@@ -103,6 +103,7 @@ def create_update_issues(
                 project=issue.fields.project.key,
                 severity=severity,
                 status=issue.fields.status.name,
+                issue_type=issue.fields.issuetype.name.lower(),
                 customer_escaped=issue.is_customer_escaped,
                 date_created=format_issue_date(issue.fields.created),
                 last_updated=format_issue_date(issue.fields.updated),
