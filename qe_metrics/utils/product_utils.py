@@ -42,7 +42,8 @@ def append_last_updated_arg(query: str, look_back_days: int) -> str:
         str: A query with an argument to filter issues that have been updated in the last 'look_back_days' days
     """
     if any(word in query for word in ["updatedDate", "updated"]):
-        LOGGER.error("Query is already using the 'updatedDate' or 'updated' field. Please remove it:\n{query}")
-        return query
+        raise ValueError(
+            f'Query is already using the "updatedDate" or "updated" field. Query will not be executed. \nQuery: "{query}"'
+        )
     else:
         return f'{query} AND updated > "-{look_back_days}d"'

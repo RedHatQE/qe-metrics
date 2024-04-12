@@ -23,6 +23,5 @@ def test_append_last_updated_arg_appends_arg():
 
 
 def test_append_last_updated_arg_not_append_arg():
-    expected_query = 'project = TEST AND status = Open AND updated > "-365d"'
-    query = append_last_updated_arg(query='project = TEST AND status = Open AND updated > "-365d"', look_back_days=90)
-    assert query == expected_query, f"actual: {query} != expected: {expected_query}"
+    with pytest.raises(ValueError):
+        append_last_updated_arg(query='project = TEST AND status = Open AND updated > "-365d"', look_back_days=90)
