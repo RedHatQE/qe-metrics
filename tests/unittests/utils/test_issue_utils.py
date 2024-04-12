@@ -141,6 +141,7 @@ def test_create_update_issues_creates_issues(product, raw_jira_issues):
                     "project": "OLD",
                     "severity": "blocker",
                     "status": "Open",
+                    "issue_type": "bug",
                     "customer_escaped": False,
                     "date_created": "2023-01-01",
                     "last_updated": "2023-01-01",
