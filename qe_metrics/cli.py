@@ -48,14 +48,13 @@ def main(products_file: str, config_file: str, pdb: bool, verbose_db: bool) -> N
             for severity, query in queries.items():
                 LOGGER.info(f'Executing Jira query for "{product.name}" with severity "{severity}"')
                 try:
-                    create_update_issues(
-                        issues=jira.search(
-                            query=append_last_updated_arg(query=query, look_back_days=data_retention_days)
-                        ),
-                        product=product,
-                        severity=severity,
-                        jira_server=jira.jira_config["server"],
-                    )
+                    if query := append_last_updated_arg(query=query, look_back_days=data_retention_days):
+                        create_update_issues(
+                            issues=jira.search(query=query),
+                            product=product,
+                            severity=severity,
+                            jira_server=jira.jira_config["server"],
+                        )
                 except Exception as ex:
                     LOGGER.error(f'Failed to update issues for "{product.name}" with severity "{severity}": {ex}')
         delete_old_issues(days_old=data_retention_days)

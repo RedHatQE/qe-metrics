@@ -128,8 +128,5 @@ def delete_old_issues(days_old: int) -> None:
         lambda _issue: _issue.last_updated < (datetime.now().date() - timedelta(days=days_old))
     )
     LOGGER.info(f"Deleting {len(issues)} issues that haven't been updated in {days_old} days from the database")
-    try:
-        [issue.delete() for issue in issues]
-        orm.commit()
-    except Exception as ex:
-        LOGGER.error(f"Failed to delete issues from the database: {ex}")
+    [issue.delete() for issue in issues]
+    orm.commit()

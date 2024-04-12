@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 from qe_metrics.libs.database_mapping import ProductsEntity
 from pyaml_env import parse_config
 from pony import orm
@@ -30,7 +30,7 @@ def products_from_file(products_file: str) -> List[Dict[Any, Any]]:
     return products
 
 
-def append_last_updated_arg(query: str, look_back_days: int) -> str:
+def append_last_updated_arg(query: str, look_back_days: int) -> Optional[str]:
     """
     Add the last updated argument to the queries.
 
@@ -42,8 +42,9 @@ def append_last_updated_arg(query: str, look_back_days: int) -> str:
         str: A query with an argument to filter issues that have been updated in the last 'look_back_days' days
     """
     if any(word in query for word in ["updatedDate", "updated"]):
-        raise ValueError(
+        LOGGER.error(
             f'Query is already using the "updatedDate" or "updated" field. Query will not be executed. \nQuery: "{query}"'
         )
+        return None
     else:
         return f'{query} AND updated > "-{look_back_days}d"'

@@ -23,5 +23,5 @@ def test_append_last_updated_arg_appends_arg():
 
 
 def test_append_last_updated_arg_not_append_arg():
-    with pytest.raises(ValueError):
-        append_last_updated_arg(query='project = TEST AND status = Open AND updated > "-365d"', look_back_days=90)
+    query = append_last_updated_arg(query='project = TEST AND status = Open AND updated > "-365d"', look_back_days=90)
+    assert not query
