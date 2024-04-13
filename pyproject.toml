@@ -45,6 +45,7 @@ psycopg2-binary = "^2.9.9"
 pony = "^0.7.17"
 pyaml-env = "^1.2.1"
 ipdb = "^0.13.13"
+pyhelper-utils = "^0.0.8"
 
 [tool.poetry.group.dev.dependencies]
 tox = "^4.11.4"
