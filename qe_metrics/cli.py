@@ -14,6 +14,7 @@ from pyhelper_utils.runners import function_runner_with_pdb
 LOGGER = get_logger(name="main-qe-metrics")
 
 
+@orm.db_session
 def qe_metrics(products_file: str, config_file: str, verbose_db: bool) -> None:
     """Gather QE Metrics"""
 
