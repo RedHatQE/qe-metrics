@@ -14,7 +14,6 @@ from pyhelper_utils.runners import function_runner_with_pdb
 LOGGER = get_logger(name="main-qe-metrics")
 
 
-@orm.db_session
 def qe_metrics(products_file: str, config_file: str, verbose_db: bool) -> None:
     """Gather QE Metrics"""
 
@@ -60,13 +59,11 @@ def qe_metrics(products_file: str, config_file: str, verbose_db: bool) -> None:
     help="Verbose output of database connection.",
     type=click.BOOL,
 )
-@orm.db_session
 def cli_entrypoint(products_file: str, config_file: str, pdb: bool, verbose_db: bool) -> None:
     function_runner_with_pdb(
         func=qe_metrics,
         products_file=products_file,
         config_file=config_file,
-        pdb=pdb,
         verbose_db=verbose_db,
     )
 
