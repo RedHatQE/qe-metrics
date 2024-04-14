@@ -14,7 +14,7 @@ from flask.logging import default_handler
 from flask import Flask
 
 
-APP = Flask("qe_metrics")  # noqa: FCN001
+APP = Flask("qe_metrics")
 APP.logger.removeHandler(default_handler)
 APP.logger.addHandler(get_logger(APP.logger.name).handlers[0])
 
@@ -25,7 +25,7 @@ def run_in_while(products_file: str, config_file: str, verbose_db: bool) -> None
         run_interval = config.get("run_interval", "24h")
         qe_metrics(products_file=products_file, config_file=config_file, verbose_db=verbose_db)
         APP.logger.info(f"Sleeping for {run_interval}")
-        time.sleep(tts(ts=run_interval))  # noqa: FCN001
+        time.sleep(tts(ts=run_interval))
 
 
 @click.command()
@@ -61,7 +61,7 @@ def cli_entrypoint(products_file: str, config_file: str, pdb: bool, verbose_db: 
     )
 
 
-@APP.route("/update", methods=["POST"])
+@APP.route("/update", methods=["GET"])
 def update_qe_metrics() -> str:
     config_file, products_file = get_config_files_path_from_os_env()
     qe_metrics(products_file=products_file, config_file=config_file, verbose_db=run_in_verbose())
