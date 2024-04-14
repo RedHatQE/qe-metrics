@@ -11,7 +11,6 @@ Queries Jira and stores results in a database for further analysis in Grafana.
 The qe-metrics tool uses a YAML file passed to it using the `--config-file` option as its source of credentials and other
 configuration values. The file holds these values for both the database and the Jira server used by the tool.
 If slack is configured, send success and failure messages to slack.
-
 Here is an example of a configuration file:
 
 ```yaml
