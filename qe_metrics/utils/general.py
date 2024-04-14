@@ -1,9 +1,11 @@
-from typing import Any
+import os
+from typing import Any, Tuple
+
 
 from simple_logger.logger import get_logger
 
 
-LOGGER = get_logger(name=__name__)
+LOGGER = get_logger(name="general")
 
 
 def verify_config(config: dict[str, Any], required_keys: list[str]) -> None:
@@ -48,3 +50,13 @@ def verify_queries(queries_dict: dict[str, str]) -> None:
 
     if extra_queries := [query for query in queries_dict if query not in required_queries]:
         raise ValueError(f"Extra queries in the products file: {' '.join(extra_queries)}")
+
+
+def get_config_files_path_from_os_env() -> Tuple[str, str]:
+    products_file = os.environ.get("QE_METRICS_PRODUCTS", "products.yaml")
+    config_file = os.environ.get("QE_METRICS_CONFIG", "config.yaml")
+    return config_file, products_file
+
+
+def run_in_verbose() -> bool:
+    return True if os.environ.get("QE_METRICS_VERBOSE") else False

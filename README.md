@@ -14,6 +14,7 @@ If slack is configured, send success and failure messages to slack.
 Here is an example of a configuration file:
 
 ```yaml
+run_interval: 24h # accept s/m/h
 slack:
   webhook_url: https://<your-slack-webhook-url>
   webhook_error_url: https://<your-slack-webhook-url>

@@ -40,6 +40,7 @@ class Database:
         exc_value: Optional[BaseException],
         traceback: Optional[TracebackType],
     ) -> None:
+        __import__("ipdb").set_trace()
         if DB_OBJECT:
             DB_OBJECT.disconnect()
             self.logger.success("Disconnected from the database")
