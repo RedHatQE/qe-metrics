@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 import pytest
 import yaml
 
@@ -71,7 +72,9 @@ def raw_jira_issues(request, mocker):
         mock_issue.fields.issuetype.name = issue.get("issue_type", "bug")
         mock_issue.fields.customfield_12313440 = issue.get("customer_escaped", "0.0")
         mock_issue.is_customer_escaped = float(getattr(mock_issue.fields, "customfield_12313440")) > 0
-        mock_issue.fields.updated = issue.get("last_updated", "2023-12-31T23:59:59.999999+0000")
-        mock_issue.fields.created = issue.get("created", "2023-12-31T23:59:59.999999+0000")
+        mock_issue.fields.updated = issue.get(
+            "last_updated", datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f%z")
+        )
+        mock_issue.fields.created = issue.get("created", datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f%z"))
         issues.append(mock_issue)
     yield issues

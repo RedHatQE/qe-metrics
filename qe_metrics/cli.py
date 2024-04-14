@@ -10,7 +10,6 @@ from qe_metrics.utils.issue_utils import create_update_issues
 from qe_metrics.utils.product_utils import products_from_file
 from pyhelper_utils.runners import function_runner_with_pdb
 
-
 LOGGER = get_logger(name="main-qe-metrics")
 
 
