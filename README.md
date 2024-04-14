@@ -10,23 +10,27 @@ Queries Jira and stores results in a database for further analysis in Grafana.
 
 The qe-metrics tool uses a YAML file passed to it using the `--config-file` option as its source of credentials and other
 configuration values. The file holds these values for both the database and the Jira server used by the tool.
+If slack is configured, send success and failure messages to slack.
 Here is an example of a configuration file:
 
 ```yaml
+slack:
+  webhook_url: https://<your-slack-webhook-url>
+  webhook_error_url: https://<your-slack-webhook-url>
 database:
-    host: some.database.com
-    user: my-user
-    password: p@ssw0rd
-    database: qe-metrics
-    port: 1234
-    provider: postgres
-    local: false
-    local_filepath: /tmp/my-db.sqlite
-    data_retention_days: 180
+  host: some.database.com
+  user: my-user
+  password: p@ssw0rd
+  database: qe-metrics
+  port: 1234
+  provider: postgres
+  local: false
+  local_filepath: /tmp/my-db.sqlite
+  data_retention_days: 180
 jira:
   token: some-token
   server: https://jira-server.com
-````
+```
 
 #### Database Credentials and Configuration
 
@@ -83,7 +87,6 @@ severities are supported:
 
 - `blocker`
 - `critical-blocker`
-
 
 ## Database
 

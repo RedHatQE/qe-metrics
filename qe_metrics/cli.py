@@ -1,4 +1,5 @@
 import os
+from typing import Dict, List
 
 import click
 from pony import orm
@@ -10,13 +11,20 @@ from qe_metrics.libs.jira import Jira
 from qe_metrics.utils.issue_utils import create_update_issues, delete_old_issues
 from qe_metrics.utils.product_utils import append_last_updated_arg, products_from_file
 from pyhelper_utils.runners import function_runner_with_pdb
+from pyhelper_utils.notifications import send_slack_message
+
 
 LOGGER = get_logger(name="main-qe-metrics")
 
 
 def qe_metrics(products_file: str, config_file: str, verbose_db: bool) -> None:
     """Gather QE Metrics"""
-    data_retention_days = parse_config(path=config_file)["database"].get("data_retention_days", 90)
+    errors_for_slack: List[str] = []
+    config = parse_config(path=config_file)
+    data_retention_days: int = config["database"].get("data_retention_days", 90)
+    slack_config: Dict[str, str] = config.get("slack", {})
+    slack_webhook_url: str = slack_config.get("webhook_url", "")
+    slack_webhook_error_url: str = slack_config.get("webhook_error_url", "")
 
     with Database(config_file=config_file, verbose=verbose_db), Jira(config_file=config_file) as jira, orm.db_session:
         for product_dict in products_from_file(products_file=products_file):
@@ -32,8 +40,21 @@ def qe_metrics(products_file: str, config_file: str, verbose_db: bool) -> None:
                             jira_server=jira.jira_config["server"],
                         )
                 except Exception as ex:
-                    LOGGER.error(f'Failed to update issues for "{product.name}" with severity "{severity}": {ex}')
-        delete_old_issues(days_old=data_retention_days)
+                    err_msg = f'Failed to update issues for "{product.name}" with severity "{severity}": {ex}'
+                    LOGGER.error(err_msg)
+                    errors_for_slack.append(err_msg)
+
+        if not delete_old_issues(days_old=data_retention_days):
+            errors_for_slack.append("Failed to delete old issues")
+
+        if errors_for_slack and slack_webhook_error_url:
+            send_slack_message(
+                webhook_url=slack_webhook_error_url, message="\n".join(errors_for_slack), raise_on_error=False
+            )
+        elif slack_webhook_url:
+            send_slack_message(
+                webhook_url=slack_webhook_url, message="Successfully executeed qe-metrics", raise_on_error=False
+            )
 
 
 @click.command()
