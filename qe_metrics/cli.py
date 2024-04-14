@@ -10,13 +10,19 @@ from qe_metrics.libs.jira import Jira
 from qe_metrics.utils.issue_utils import create_update_issues, delete_old_issues
 from qe_metrics.utils.product_utils import append_last_updated_arg, products_from_file
 from pyhelper_utils.runners import function_runner_with_pdb
+from pyhelper_utils.notifications import send_slack_message
+
 
 LOGGER = get_logger(name="main-qe-metrics")
 
 
 def qe_metrics(products_file: str, config_file: str, verbose_db: bool) -> None:
     """Gather QE Metrics"""
-    data_retention_days = parse_config(path=config_file)["database"].get("data_retention_days", 90)
+    config = parse_config(path=config_file)
+    data_retention_days = config["database"].get("data_retention_days", 90)
+    slack_config = config["slack"]
+    slack_webhook_url = slack_config["webhook_url"]
+    slack_webhook_error_url = slack_config["webhook_error_url"]
 
     with Database(config_file=config_file, verbose=verbose_db), Jira(config_file=config_file) as jira, orm.db_session:
         for product_dict in products_from_file(products_file=products_file):
@@ -32,8 +38,19 @@ def qe_metrics(products_file: str, config_file: str, verbose_db: bool) -> None:
                             jira_server=jira.jira_config["server"],
                         )
                 except Exception as ex:
-                    LOGGER.error(f'Failed to update issues for "{product.name}" with severity "{severity}": {ex}')
-        delete_old_issues(days_old=data_retention_days)
+                    err_msg = f'Failed to update issues for "{product.name}" with severity "{severity}": {ex}'
+                    LOGGER.error(err_msg)
+                    send_slack_message(webhook_url=slack_webhook_error_url, message=err_msg, raise_on_error=False)
+
+        if not delete_old_issues(days_old=data_retention_days):
+            send_slack_message(
+                webhook_url=slack_webhook_error_url, message="Successfully execute qe-metrics", raise_on_error=False
+            )
+
+        else:
+            send_slack_message(
+                webhook_url=slack_webhook_url, message="Failed to execute qe-metrics", raise_on_error=False
+            )
 
 
 @click.command()
