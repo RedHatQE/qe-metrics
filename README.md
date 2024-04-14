@@ -22,6 +22,7 @@ database:
     provider: postgres
     local: false
     local_filepath: /tmp/my-db.sqlite
+    data_retention_days: 180
 jira:
   token: some-token
   server: https://jira-server.com
@@ -44,6 +45,8 @@ Optional values:
   - Default: `false`
 - `local_filepath`: Optional path to the local SQLite database file.
   - Default: `/tmp/qe_metrics.sqlite`
+- `data_retention_days`: A value used for database cleanup operations and for filtering issues in queries. The value corresponds to the number of days since an issue has been updated.
+  - Default: 90
 
 #### Jira Credentials and Configuration
 
@@ -68,6 +71,11 @@ The example above defines two "products", `some_product` and `another_product`, 
 "severity" of `blocker` and `critical-blocker`. The queries are written in [Jira Query Language (JQL)](https://support.atlassian.com/jira-software-cloud/docs/use-advanced-search-with-jira-query-language-jql/)
 and are used to define which issues should be associated with the `product` and `severity` in the database.
 
+#### Rules
+
+1. Do not add an argument to filter your bugs based on the "Updated" date in Jira.
+   - Example: `project = 'PRODUCT' AND resolution = Unresolved AND Issuetype = bug AND priority = blocker AND updated > "-90d"`
+
 #### Severity
 
 The severity of a query is used to define the severity of the issues returned by the query. Currently, the following
@@ -77,12 +85,18 @@ severities are supported:
 - `critical-blocker`
 
 
-## Database Schema
+## Database
+
+### Schema
 
 The supporting database for the tool consists of two tables -- `jiraissues` and `products`.
 
 ![Database Schema](docs/img/db-schema.png)
 
 Because the tool makes use of an [object relational mapper](https://docs.ponyorm.org/), the tables are created by the tool if they are not already present in the database when the tool is executed. If this tool is being used with a new database, it is recommended to allow the tool to create the tables.
+
+### Retention Policy
+
+The tool automatically enforces the database retention policy on every execution. The retention policy is to delete any issue from the qe-metrics database that hasn't been updated (per the "Updated" date in the Jira issues) within the number of days defined in `data_retention_days` in the config file (see [Configuration](#configuration) section for more information). If an issue hasn't been updated in `data_retention_days` days and is removed from the database, it will be re-added during the next execution if it has been updated since being removed.
 
 <!-- TODO: Add outline of how CI will work -->

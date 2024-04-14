@@ -3,12 +3,13 @@ import sys
 
 import click
 from pony import orm
+from pyaml_env import parse_config
 
 from simple_logger.logger import get_logger
 from qe_metrics.libs.database import Database
 from qe_metrics.libs.jira import Jira
-from qe_metrics.utils.issue_utils import create_update_issues
-from qe_metrics.utils.product_utils import products_from_file
+from qe_metrics.utils.issue_utils import create_update_issues, delete_old_issues
+from qe_metrics.utils.product_utils import products_from_file, append_last_updated_arg
 
 LOGGER = get_logger(name="main-qe-metrics")
 
@@ -39,23 +40,24 @@ LOGGER = get_logger(name="main-qe-metrics")
 )
 def main(products_file: str, config_file: str, pdb: bool, verbose_db: bool) -> None:
     """Gather QE Metrics"""
+    data_retention_days = parse_config(path=config_file)["database"].get("data_retention_days", 90)
 
     with Database(config_file=config_file, verbose=verbose_db), Jira(config_file=config_file) as jira, orm.db_session:
-        # TODO: Run a cleanup of the database to remove old entries
-
         for product_dict in products_from_file(products_file=products_file):
             product, queries = product_dict.values()
             for severity, query in queries.items():
                 LOGGER.info(f'Executing Jira query for "{product.name}" with severity "{severity}"')
                 try:
-                    create_update_issues(
-                        issues=jira.search(query=query),
-                        product=product,
-                        severity=severity,
-                        jira_server=jira.jira_config["server"],
-                    )
+                    if query := append_last_updated_arg(query=query, look_back_days=data_retention_days):
+                        create_update_issues(
+                            issues=jira.search(query=query),
+                            product=product,
+                            severity=severity,
+                            jira_server=jira.jira_config["server"],
+                        )
                 except Exception as ex:
                     LOGGER.error(f'Failed to update issues for "{product.name}" with severity "{severity}": {ex}')
+        delete_old_issues(days_old=data_retention_days)
 
 
 if __name__ == "__main__":

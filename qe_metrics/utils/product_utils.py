@@ -28,3 +28,23 @@ def products_from_file(products_file: str) -> List[Dict[Any, Any]]:
             LOGGER.error(f"Error occurred parsing queries for product {name}: {err}")
     orm.commit()
     return products
+
+
+def append_last_updated_arg(query: str, look_back_days: int) -> str:
+    """
+    Add the last updated argument to the queries.
+
+    Args:
+        query (str): Query to be modified
+        look_back_days (int): Number of days to look back when querying for issues
+
+    Returns:
+        str: A query with an argument to filter issues that have been updated in the last 'look_back_days' days
+    """
+    if any(word in query for word in ["updatedDate", "updated"]):
+        LOGGER.error(
+            f'Query is already using the "updatedDate" or "updated" field. Query will not be executed. \nQuery: "{query}"'
+        )
+        return ""
+    else:
+        return f'{query} AND updated > "-{look_back_days}d"'

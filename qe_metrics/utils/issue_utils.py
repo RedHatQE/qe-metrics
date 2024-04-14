@@ -1,5 +1,6 @@
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from pony import orm
+from pyhelper_utils.general import ignore_exceptions
 from typing import List
 from jira import Issue
 from qe_metrics.libs.database_mapping import ProductsEntity, JiraIssuesEntity
@@ -112,4 +113,20 @@ def create_update_issues(
     mark_obsolete_issues(
         current_issues=issues, db_issues=JiraIssuesEntity.select(product=product, severity=severity), product=product
     )
+    orm.commit()
+
+
+@ignore_exceptions(logger=LOGGER)
+def delete_old_issues(days_old: int) -> None:
+    """
+    Delete issues from the database that were last updated more than the number of days defined in days_old.
+
+    Args:
+        days_old (int): Number of days from the last_updated date to keep issues in the database
+    """
+    issues = JiraIssuesEntity.select(  # noqa: FCN001
+        lambda _issue: _issue.last_updated < (datetime.now().date() - timedelta(days=days_old))
+    )
+    LOGGER.info(f"Deleting {len(issues)} issues that haven't been updated in {days_old} days from the database")
+    [issue.delete() for issue in issues]
     orm.commit()
