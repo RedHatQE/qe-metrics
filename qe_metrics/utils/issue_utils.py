@@ -92,8 +92,6 @@ def create_update_issues(
     Returns:
         List["JiraIssuesEntity"]: A list of JiraIssuesEntity objects
     """
-    # TODO: every function that we call here should raise exception on error,
-    # TODO: here we need to try:except and raise in order to get all errors populated to slack
     for issue in issues:
         if existing_issue := JiraIssuesEntity.get(issue_key=issue.key, product=product):
             update_existing_issue(existing_issue=existing_issue, new_issue_data=issue, severity=severity)
