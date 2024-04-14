@@ -116,8 +116,8 @@ def create_update_issues(
     orm.commit()
 
 
-@ignore_exceptions(logger=LOGGER)
-def delete_old_issues(days_old: int) -> None:
+@ignore_exceptions(logger=LOGGER, return_on_error=False)
+def delete_old_issues(days_old: int) -> bool:
     """
     Delete issues from the database that were last updated more than the number of days defined in days_old.
 
@@ -130,3 +130,4 @@ def delete_old_issues(days_old: int) -> None:
     LOGGER.info(f"Deleting {len(issues)} issues that haven't been updated in {days_old} days from the database")
     [issue.delete() for issue in issues]
     orm.commit()
+    return True
