@@ -1,19 +1,20 @@
 from typing import Any, Dict, List
 from qe_metrics.libs.database_mapping import ProductsEntity
 from pyaml_env import parse_config
-from pony import orm
 from qe_metrics.utils.general import verify_queries
 from simple_logger.logger import get_logger
+from sqlalchemy.orm import Session
 
 LOGGER = get_logger(name=__name__)
 
 
-def products_from_file(products_file: str) -> List[Dict[Any, Any]]:
+def products_from_file(products_file: str, session: Session) -> List[Dict[Any, Any]]:
     """
     Initialize the ProductsEntity class from a file. Create new entries if they do not exist.
 
     Args:
         products_file (str): Path to the yaml file holding product names and their queries
+        session (Session): SQLAlchemy Session instance.
 
     Returns:
         List[Dict[Any, Any]]: A list of dictionaries that hold the product and its queries
@@ -23,10 +24,14 @@ def products_from_file(products_file: str) -> List[Dict[Any, Any]]:
     for name, queries in products_dict.items():
         try:
             verify_queries(queries_dict=queries)
-            products.append({"product": ProductsEntity.get(name=name) or ProductsEntity(name=name), "queries": queries})
+            product = session.query(ProductsEntity).filter_by(name=name).first()
+            if product is None:
+                product = ProductsEntity(name=name)
+                session.add(product)
+            products.append({"product": product, "queries": queries})
         except ValueError as err:
             LOGGER.error(f"Error occurred parsing queries for product {name}: {err}")
-    orm.commit()
+    session.commit()
     return products
 
 
