@@ -102,7 +102,7 @@ def create_update_issues(
             )
         else:
             session.add(
-                JiraIssuesEntity(
+                instance=JiraIssuesEntity(
                     product_id=product.id,
                     issue_key=issue.key,
                     title=issue.fields.summary,
@@ -116,7 +116,6 @@ def create_update_issues(
                     last_updated=format_issue_date(issue.fields.updated),
                 )
             )
-            session.flush()
 
     mark_obsolete_issues(
         current_issues=issues,
