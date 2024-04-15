@@ -27,7 +27,7 @@ def products_from_file(products_file: str, session: Session) -> List[Dict[Any, A
             product = session.query(ProductsEntity).filter_by(name=name).first()
             if product is None:
                 product = ProductsEntity(name=name)
-                session.add(product)
+                session.add(instance=product)
             products.append({"product": product, "queries": queries})
         except ValueError as err:
             LOGGER.error(f"Error occurred parsing queries for product {name}: {err}")
