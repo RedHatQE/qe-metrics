@@ -46,7 +46,7 @@ class Database:
             str: A sqlalchemy connection string.
         """
         if db_config["local"]:
-            return f"sqlite:///{db_config['local_filepath']}"
+            return f"sqlite:///{db_config.get('local_filepath', '/tmp/qe_metrics.sqlite')}"
         else:
             verify_config(config=db_config, required_keys=["host", "user", "password", "database"])
             return str(
