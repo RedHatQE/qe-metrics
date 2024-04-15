@@ -23,7 +23,7 @@ def qe_metrics(products_file: str, config_file: str, verbose_db: bool) -> None:
     slack_webhook_error_url: str = slack_config.get("webhook_error_url", "")
 
     with Database(config_file=config_file, verbose=verbose_db) as db, Jira(config_file=config_file) as jira:
-        for product_dict in products_from_file(products_file=products_file, session=db.session):
+        for product_dict in products_from_file(products_file=products_file, db_session=db.session):
             product, queries = product_dict.values()
             for severity, query in queries.items():
                 LOGGER.info(f'Executing Jira query for "{product.name}" with severity "{severity}"')
@@ -34,7 +34,7 @@ def qe_metrics(products_file: str, config_file: str, verbose_db: bool) -> None:
                             product=product,
                             severity=severity,
                             jira_server=jira.jira_config["server"],
-                            session=db.session,
+                            db_session=db.session,
                         )
                 except Exception as ex:
                     err_msg = f'Failed to update issues for "{product.name}" with severity "{severity}": {ex}'

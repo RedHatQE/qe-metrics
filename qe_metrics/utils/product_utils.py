@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 LOGGER = get_logger(name=__name__)
 
 
-def products_from_file(products_file: str, session: Session) -> List[Dict[Any, Any]]:
+def products_from_file(products_file: str, db_session: Session) -> List[Dict[Any, Any]]:
     """
     Initialize the ProductsEntity class from a file. Create new entries if they do not exist.
 
@@ -24,14 +24,14 @@ def products_from_file(products_file: str, session: Session) -> List[Dict[Any, A
     for name, queries in products_dict.items():
         try:
             verify_queries(queries_dict=queries)
-            product = session.query(ProductsEntity).filter_by(name=name).first()
+            product = db_session.query(ProductsEntity).filter_by(name=name).first()
             if product is None:
                 product = ProductsEntity(name=name)
-                session.add(instance=product)
+                db_session.add(instance=product)
             products.append({"product": product, "queries": queries})
         except ValueError as err:
             LOGGER.error(f"Error occurred parsing queries for product {name}: {err}")
-    session.commit()
+    db_session.commit()
     return products
 
 

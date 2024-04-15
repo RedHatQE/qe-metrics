@@ -9,7 +9,7 @@ from qe_metrics.utils.product_utils import products_from_file, append_last_updat
     indirect=True,
 )
 def test_products_from_file(tmp_products_file, tmp_sqlite_db):
-    products_from_file(products_file=tmp_products_file, session=tmp_sqlite_db.session)
+    products_from_file(products_file=tmp_products_file, db_session=tmp_sqlite_db.session)
     assert "test-from-file-product" in [
         _product.name for _product in tmp_sqlite_db.session.query(ProductsEntity).all()
     ], "Test product test-from-file-product not found in database."
