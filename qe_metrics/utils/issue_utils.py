@@ -124,7 +124,7 @@ def delete_old_issues(days_old: int) -> bool:
     Args:
         days_old (int): Number of days from the last_updated date to keep issues in the database
     """
-    issues = JiraIssuesEntity.select(  # noqa: FCN001
+    issues = JiraIssuesEntity.select(
         lambda _issue: _issue.last_updated < (datetime.now().date() - timedelta(days=days_old))
     )
     LOGGER.info(f"Deleting {len(issues)} issues that haven't been updated in {days_old} days from the database")

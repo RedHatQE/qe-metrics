@@ -15,7 +15,10 @@ fcn_exclude_functions =
     LOGGER,
     logger,
     orm,
-    yaml
+    yaml,
+    Flask,
+    time,
+    JiraIssuesEntity,
 
 enable-extensions =
     FCN,
