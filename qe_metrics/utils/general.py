@@ -52,10 +52,5 @@ def verify_queries(queries_dict: dict[str, str]) -> None:
         raise ValueError(f"Extra queries in the products file: {' '.join(extra_queries)}")
 
 
-def get_config_file_path_from_os_env() -> str:
-    config_file = os.environ.get("QE_METRICS_CONFIG", "config.yaml")
-    return config_file
-
-
 def run_in_verbose() -> bool:
     return True if os.environ.get("QE_METRICS_VERBOSE") else False

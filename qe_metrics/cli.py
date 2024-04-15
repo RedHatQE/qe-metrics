@@ -7,7 +7,7 @@ import click
 from pyaml_env import parse_config
 from simple_logger.logger import get_logger
 from qe_metrics.utils.entrypoint import qe_metrics
-from qe_metrics.utils.general import get_config_file_path_from_os_env, run_in_verbose
+from qe_metrics.utils.general import run_in_verbose
 from pyhelper_utils.runners import function_runner_with_pdb
 from pyhelper_utils.general import tts
 from flask.logging import default_handler
@@ -68,16 +68,18 @@ def cli_entrypoint(products_file: str, config_file: str, pdb: bool, verbose_db: 
 
 @APP.route("/update", methods=["GET"])
 def update_qe_metrics() -> str:
-    config_file = get_config_file_path_from_os_env()
-    qe_metrics(products_file_url=True, config_file=config_file, verbose_db=run_in_verbose())
+    qe_metrics(
+        products_file_url=True,
+        config_file=os.environ.get("QE_METRICS_CONFIG", "config.yaml"),
+        verbose_db=run_in_verbose(),
+    )
     return "OK"
 
 
 if __name__ == "__main__":
-    config_file = get_config_file_path_from_os_env()
     proc = Process(
         target=run_in_while,
-        kwargs={"config_file": config_file, "verbose_db": run_in_verbose()},
+        kwargs={"config_file": os.environ.get("QE_METRICS_CONFIG", "config.yaml"), "verbose_db": run_in_verbose()},
     )
     proc.start()
 
