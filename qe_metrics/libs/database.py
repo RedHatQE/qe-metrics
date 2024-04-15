@@ -1,10 +1,11 @@
 from types import TracebackType
 from typing import Any, Dict, Optional, Type
 
-from sqlalchemy import create_engine, URL
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from pyaml_env import parse_config
 from simple_logger.logger import get_logger
+from urllib.parse import quote_plus
 
 from qe_metrics.utils.general import verify_config
 from qe_metrics.libs.database_mapping import Base
@@ -49,13 +50,10 @@ class Database:
             return f"sqlite:///{db_config.get('local_filepath', '/tmp/qe_metrics.sqlite')}"
         else:
             verify_config(config=db_config, required_keys=["host", "user", "password", "database"])
-            return str(
-                URL.create(
-                    drivername=db_config.get("provider", "postgresql"),
-                    username=db_config["user"],
-                    password=db_config["password"],
-                    host=db_config["host"],
-                    port=db_config.get("port", 5432),
-                    database=db_config["database"],
-                )
-            )
+            drivername = db_config.get("provider", "postgresql")
+            username = db_config["user"]
+            password = quote_plus(string=db_config["password"])
+            host = db_config["host"]
+            port = db_config.get("port", 5432)
+            database = db_config["database"]
+            return f"{drivername}://{username}:{password}@{host}:{port}/{database}"
