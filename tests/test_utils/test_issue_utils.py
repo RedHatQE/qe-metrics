@@ -168,8 +168,7 @@ def test_create_update_issues_creates_issues(product, raw_jira_issues, tmp_sqlit
     indirect=True,
 )
 def test_delete_old_issues(product, jira_issues, tmp_sqlite_db):
-    delete_old_issues(days_old=180, session=tmp_sqlite_db.session)
-    tmp_sqlite_db.session.query(JiraIssuesEntity).filter(JiraIssuesEntity.issue_key == jira_issues[0].issue_key).first()
+    delete_old_issues(days_old=180, db_session=tmp_sqlite_db.session)
     assert (
         not tmp_sqlite_db.session.query(JiraIssuesEntity)
         .filter(JiraIssuesEntity.issue_key == jira_issues[0].issue_key)
