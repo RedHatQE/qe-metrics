@@ -1,4 +1,6 @@
 import pytest
+from datetime import datetime
+
 from qe_metrics.libs.database_mapping import JiraIssuesEntity, ProductsEntity
 
 
@@ -17,18 +19,17 @@ from qe_metrics.libs.database_mapping import JiraIssuesEntity, ProductsEntity
                     "status": "Open",
                     "issue_type": "bug",
                     "customer_escaped": False,
-                    "date_created": "2024-01-01",
-                    "last_updated": "2024-01-01",
+                    "date_created": datetime.strptime("2024-01-01", "%Y-%m-%d").date(),
+                    "last_updated": datetime.strptime("2024-01-01", "%Y-%m-%d").date(),
                 }
             ],
         )
     ],
     indirect=True,
 )
-def test_database_jira_issues_entry(product, jira_issues):
-    all_jira_issues = JiraIssuesEntity.select()
+def test_database_jira_issues_entry(jira_issues, tmp_sqlite_db):
     assert jira_issues[0].issue_key in [
-        _issue.issue_key for _issue in all_jira_issues
+        _issue.issue_key for _issue in tmp_sqlite_db.session.query(JiraIssuesEntity).all()
     ], f"Test Jira issue {jira_issues[0].issue_key} not found in database."
 
 
@@ -37,8 +38,7 @@ def test_database_jira_issues_entry(product, jira_issues):
     [("test-product-entry-product")],
     indirect=True,
 )
-def test_database_products_entry(product):
-    all_products = ProductsEntity.select()
+def test_database_products_entry(product, tmp_sqlite_db):
     assert product.name in [
-        _product.name for _product in all_products
+        _product.name for _product in tmp_sqlite_db.session.query(ProductsEntity).all()
     ], f"Test product {product.name} not found in database."

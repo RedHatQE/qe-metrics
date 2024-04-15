@@ -4,22 +4,15 @@ import yaml
 
 from qe_metrics.libs.database import Database
 from qe_metrics.libs.database_mapping import ProductsEntity, JiraIssuesEntity
-from pony import orm
 
 
-@pytest.fixture(scope="module")
-def db_session():
-    with orm.db_session:
-        yield
-
-
-@pytest.fixture(scope="session")
+@pytest.fixture
 def tmp_sqlite_db(tmp_db_config) -> Database:
     with Database(config_file=tmp_db_config, verbose=False) as database:
         yield database
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def tmp_db_config(tmp_path_factory) -> str:
     tmp_dir = tmp_path_factory.mktemp(basename="qe-metrics-test")
 
@@ -45,19 +38,20 @@ def tmp_products_file(tmp_path, request):
 
 
 @pytest.fixture
-def product(db_session, tmp_sqlite_db, request):
-    product_name = request.param
-    return ProductsEntity(name=product_name)
+def product(tmp_sqlite_db, request):
+    product = ProductsEntity(name=request.param)
+    tmp_sqlite_db.session.add(instance=product)
+    return product
 
 
 @pytest.fixture
-def jira_issues(db_session, tmp_sqlite_db, product, request):
+def jira_issues(tmp_sqlite_db, product, request):
     jira_issues = []
-    with orm.db_session:
-        for issue in request.param:
-            jira_issue = JiraIssuesEntity(product=product, **issue)
-            jira_issues.append(jira_issue)
-        yield jira_issues
+    for issue in request.param:
+        jira_issue = JiraIssuesEntity(product=product, **issue)
+        jira_issues.append(jira_issue)
+    tmp_sqlite_db.session.add_all(instances=jira_issues)
+    yield jira_issues
 
 
 @pytest.fixture
