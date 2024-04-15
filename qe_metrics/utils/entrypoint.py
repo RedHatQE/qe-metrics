@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import Dict, List
 
 
@@ -6,14 +7,16 @@ from simple_logger.logger import get_logger
 from qe_metrics.libs.database import Database
 from qe_metrics.libs.jira import Jira
 from qe_metrics.utils.issue_utils import create_update_issues, delete_old_issues
-from qe_metrics.utils.product_utils import append_last_updated_arg, products_from_file
+from qe_metrics.utils.product_utils import append_last_updated_arg, process_products, get_products_dict
 from pyhelper_utils.notifications import send_slack_message
 
 
 LOGGER = get_logger(name="main-qe-metrics")
 
 
-def qe_metrics(products_file: str, config_file: str, verbose_db: bool) -> None:
+def qe_metrics(
+    config_file: str, verbose_db: bool, products_file: str | None = None, products_file_url: bool = False
+) -> None:
     """Gather QE Metrics"""
     errors_for_slack: List[str] = []
     config = parse_config(path=config_file)
@@ -22,8 +25,9 @@ def qe_metrics(products_file: str, config_file: str, verbose_db: bool) -> None:
     slack_webhook_url: str = slack_config.get("webhook_url", "")
     slack_webhook_error_url: str = slack_config.get("webhook_error_url", "")
 
+    _products_dict = get_products_dict(products_file=products_file, products_file_url=products_file_url)
     with Database(config_file=config_file, verbose=verbose_db) as db, Jira(config_file=config_file) as jira:
-        for product_dict in products_from_file(products_file=products_file, db_session=db.session):
+        for product_dict in process_products(products_dict=_products_dict, db_session=db.session):
             product, queries = product_dict.values()
             for severity, query in queries.items():
                 LOGGER.info(f'Executing Jira query for "{product.name}" with severity "{severity}"')

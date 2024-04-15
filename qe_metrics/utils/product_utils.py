@@ -1,26 +1,49 @@
+from __future__ import annotations
 from typing import Any, Dict, List
+
+import yaml
 from qe_metrics.libs.database_mapping import ProductsEntity
 from pyaml_env import parse_config
 from qe_metrics.utils.general import verify_queries
 from simple_logger.logger import get_logger
 from sqlalchemy.orm import Session
+import requests
 
 LOGGER = get_logger(name=__name__)
 
 
-def products_from_file(products_file: str, db_session: Session) -> List[Dict[Any, Any]]:
+def products_from_repository() -> Dict[str, Dict[str, str]]:
+    res = requests.get("https://raw.githubusercontent.com/RedHatQE/qe-metrics-products-config/main/product-config.yaml")
+    return yaml.safe_load(res.content.decode("utf-8"))
+
+
+def get_products_dict(products_file: str | None = None, products_file_url: bool = False) -> Dict[str, Dict[str, str]]:
+    if products_file:
+        products = parse_config(path=products_file)
+
+    elif products_file_url:
+        products = products_from_repository()
+
+    else:
+        LOGGER.error("Either products_file or products_file_url must be set")
+        return {}
+
+    return products
+
+
+def process_products(products_dict: Dict[str, Dict[str, str]], db_session: Session) -> List[Dict[Any, Any]]:
     """
     Initialize the ProductsEntity class from a file. Create new entries if they do not exist.
 
     Args:
-        products_file (str): Path to the yaml file holding product names and their queries
-        session (Session): SQLAlchemy Session instance.
+        products_dict (Dict[str, Dict[str, str]]): A dictionary that holds the products and their queries
+        db_session (Session): SQLAlchemy Session instance.
 
     Returns:
         List[Dict[Any, Any]]: A list of dictionaries that hold the product and its queries
     """
-    products_dict = parse_config(path=products_file)
-    products = []
+    products: List[Dict[Any, Any]] = []
+
     for name, queries in products_dict.items():
         try:
             verify_queries(queries_dict=queries)
