@@ -83,7 +83,7 @@ def create_update_issues(
     issues: List[Issue], product: "ProductsEntity", severity: str, jira_server: str, db_session: Session
 ) -> None:
     """
-    Create or update JiraIssuesEntity items in the database from a list of Jira issues. Sets status of obsolete issues as "obselete".
+    Create or update JiraIssuesEntity items in the database from a list of Jira issues. Sets status of obsolete issues as "obsolete".
 
     Args:
         issues (List[Issue]): A list of Jira issues
@@ -135,6 +135,7 @@ def delete_old_issues(days_old: int, db_session: Session) -> bool:
 
     Args:
         days_old (int): Number of days from the last_updated date to keep issues in the database
+        db_session (Session): SQLAlchemy Session instance.
     """
     issues = (
         db_session.query(JiraIssuesEntity)
