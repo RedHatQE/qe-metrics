@@ -23,7 +23,12 @@ def run_in_while(products_file: str, config_file: str, verbose_db: bool) -> None
     while True:
         config = parse_config(path=config_file)
         run_interval = config.get("run_interval", "24h")
-        qe_metrics(products_file=products_file, config_file=config_file, verbose_db=verbose_db)
+
+        try:
+            qe_metrics(products_file=products_file, config_file=config_file, verbose_db=verbose_db)
+        except Exception as ex:
+            APP.logger.error(f"Failed to run qe_metrics: {ex}")
+
         APP.logger.info(f"Sleeping for {run_interval}")
         time.sleep(tts(ts=run_interval))
 
