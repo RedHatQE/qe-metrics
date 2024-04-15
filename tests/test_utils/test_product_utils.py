@@ -1,6 +1,6 @@
 import pytest
 from qe_metrics.libs.database_mapping import ProductsEntity
-from qe_metrics.utils.product_utils import products_from_file, append_last_updated_arg
+from qe_metrics.utils.product_utils import process_products, append_last_updated_arg
 
 
 @pytest.mark.parametrize(
@@ -9,7 +9,7 @@ from qe_metrics.utils.product_utils import products_from_file, append_last_updat
     indirect=True,
 )
 def test_products_from_file(db_session, tmp_products_file):
-    products_from_file(products_file=tmp_products_file)
+    process_products(products_file=tmp_products_file)
     all_products = ProductsEntity.select()
     assert "test-from-file-product" in [
         _product.name for _product in all_products

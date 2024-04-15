@@ -1,14 +1,24 @@
+from __future__ import annotations
 from typing import Any, Dict, List
+
+import yaml
 from qe_metrics.libs.database_mapping import ProductsEntity
 from pyaml_env import parse_config
 from pony import orm
 from qe_metrics.utils.general import verify_queries
 from simple_logger.logger import get_logger
+import requests
+
 
 LOGGER = get_logger(name=__name__)
 
 
-def products_from_file(products_file: str) -> List[Dict[Any, Any]]:
+def products_from_repository() -> Dict[str, Dict[str, str]]:
+    res = requests.get("https://raw.githubusercontent.com/RedHatQE/qe-metrics-products-config/main/product-config.yaml")
+    return yaml.safe_load(res.content.decode("utf-8"))
+
+
+def process_products(products_file: str | None = None, products_file_url: bool = False) -> List[Dict[Any, Any]]:
     """
     Initialize the ProductsEntity class from a file. Create new entries if they do not exist.
 
@@ -18,8 +28,18 @@ def products_from_file(products_file: str) -> List[Dict[Any, Any]]:
     Returns:
         List[Dict[Any, Any]]: A list of dictionaries that hold the product and its queries
     """
-    products_dict = parse_config(path=products_file)
-    products = []
+    products: List[Dict[Any, Any]] = []
+
+    if products_file:
+        products_dict = parse_config(path=products_file)
+
+    elif products_file_url:
+        products_dict = products_from_repository()
+
+    else:
+        LOGGER.error("Either products_file or products_file_url must be set")
+        return products
+
     for name, queries in products_dict.items():
         try:
             verify_queries(queries_dict=queries)
