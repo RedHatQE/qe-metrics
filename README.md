@@ -24,7 +24,7 @@ database:
   password: p@ssw0rd
   database: qe-metrics
   port: 1234
-  provider: postgres
+  provider: postgresql
   local: false
   local_filepath: /tmp/my-db.sqlite
   data_retention_days: 180
@@ -44,8 +44,8 @@ Optional values:
 
 - `port`: The port number of the database service.
   - Default: `5432`.
-- `provider`: Database provider. Please see [supported providers](https://ponyorm.readthedocs.io/en/latest/api_reference.html#supported-databases).
-  - Default: `postgres`.
+- `provider`: Database provider. Please see [supported providers](https://www.sqlalchemy.org/features.html#:~:text=Supported%20Databases,of%20which%20support%20multiple%20DBAPIs.).
+  - Default: `postgresql`.
 - `local`: A boolean value. If "true", a local SQLite database. If "false", the creds above are used.
   - Default: `false`
 - `local_filepath`: Optional path to the local SQLite database file.
@@ -97,7 +97,7 @@ The supporting database for the tool consists of two tables -- `jiraissues` and 
 
 ![Database Schema](docs/img/db-schema.png)
 
-Because the tool makes use of an [object relational mapper](https://docs.ponyorm.org/), the tables are created by the tool if they are not already present in the database when the tool is executed. If this tool is being used with a new database, it is recommended to allow the tool to create the tables.
+Because the tool makes use of an [object relational mapper](https://docs.sqlalchemy.org/en/20/), the tables are created by the tool if they are not already present in the database when the tool is executed. If this tool is being used with a new database, it is recommended to allow the tool to create the tables.
 
 ### Retention Policy
 
