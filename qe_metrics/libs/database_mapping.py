@@ -4,8 +4,10 @@ from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 
+
 class Base(DeclarativeBase):
     pass
+
 
 class ProductsEntity(Base):
     """
@@ -27,7 +29,7 @@ class JiraIssuesEntity(Base):
     __tablename__ = "jiraissues"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True, nullable=False)
-    product_id: Mapped[int]= mapped_column(Integer, ForeignKey('products.id'))
+    product_id: Mapped[int] = mapped_column(Integer, ForeignKey("products.id"))
     product: Mapped["ProductsEntity"] = relationship(back_populates="jira_issues")
     issue_key: Mapped[str] = mapped_column(String, nullable=False)
     title: Mapped[str] = mapped_column(String, nullable=False)
