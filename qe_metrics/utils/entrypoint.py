@@ -45,7 +45,7 @@ def qe_metrics(
                     LOGGER.error(err_msg)
                     errors_for_slack.append(err_msg)
 
-        if not delete_old_issues(days_old=data_retention_days, session=db.session):
+        if not delete_old_issues(days_old=data_retention_days, db_session=db.session):
             errors_for_slack.append("Failed to delete old issues")
 
         if errors_for_slack and slack_webhook_error_url:
