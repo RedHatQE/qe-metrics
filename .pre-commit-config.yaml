@@ -21,6 +21,7 @@ repos:
       - id: mypy
         exclude: ^(tests/)
         additional_dependencies: [types-all]
+        args: [--ignore-missing-imports, --disallow-untyped-defs]
   - repo: https://github.com/PyCQA/flake8
     rev: "7.0.0"
     hooks:
