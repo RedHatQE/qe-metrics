@@ -1,0 +1,3 @@
+[submodule "qe-metrics-products-config"]
+	path = qe-metrics-products-config
+	url = https://github.com/RedHatQE/qe-metrics-products-config.git
