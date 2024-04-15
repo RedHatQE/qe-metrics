@@ -18,27 +18,31 @@ def products_from_repository() -> Dict[str, Dict[str, str]]:
     return yaml.safe_load(res.content.decode("utf-8"))
 
 
-def process_products(products_file: str | None = None, products_file_url: bool = False) -> List[Dict[Any, Any]]:
+def get_products_dict(products_file: str | None = None, products_file_url: bool = False) -> Dict[str, Dict[str, str]]:
+    if products_file:
+        products = parse_config(path=products_file)
+
+    elif products_file_url:
+        products = products_from_repository()
+
+    else:
+        LOGGER.error("Either products_file or products_file_url must be set")
+        return {}
+
+    return products
+
+
+def process_products(products_dict: Dict[str, Dict[str, str]]) -> List[Dict[Any, Any]]:
     """
     Initialize the ProductsEntity class from a file. Create new entries if they do not exist.
 
     Args:
-        products_file (str): Path to the yaml file holding product names and their queries
+        products_dict (Dict[str, Dict[str, str]]): A dictionary that holds the products and their queries
 
     Returns:
         List[Dict[Any, Any]]: A list of dictionaries that hold the product and its queries
     """
     products: List[Dict[Any, Any]] = []
-
-    if products_file:
-        products_dict = parse_config(path=products_file)
-
-    elif products_file_url:
-        products_dict = products_from_repository()
-
-    else:
-        LOGGER.error("Either products_file or products_file_url must be set")
-        return products
 
     for name, queries in products_dict.items():
         try:
