@@ -973,17 +973,6 @@ dev = ["pre-commit", "tox"]
 testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
-name = "pony"
-version = "0.7.17"
-description = "Pony Object-Relational Mapper"
-optional = false
-python-versions = "*"
-files = [
-    {file = "pony-0.7.17-py3-none-any.whl", hash = "sha256:c37e9b44f975d147b79cf56925b16b0e40b2b47ba5958d0c01579f37a5a24f7c"},
-    {file = "pony-0.7.17.tar.gz", hash = "sha256:b72172d57abd5e0846cd8d71231572da20f526327bf0d33348a9276f624d8aa7"},
-]
-
-[[package]]
 name = "pre-commit"
 version = "3.5.0"
 description = "A framework for managing and maintaining multi-language pre-commit hooks."
@@ -1670,4 +1659,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.12"
-content-hash = "3e406e3d9d454cef807f16138d679f55643c3ef3cf403e88ca2be45431ef1a43"
+content-hash = "07378369790fb05cc8d21055f6b0f27c38b810658e7f06222edf6533d64486eb"
