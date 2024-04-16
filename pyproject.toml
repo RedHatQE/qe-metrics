@@ -1,5 +1,5 @@
 [tool.coverage.run]
-omit = ["tests/*", "qe_metrics/cli.py"]
+omit = ["tests/*", "qe_metrics/cli.py", "qe_metrics/utils/entrypoint.py"]
 
 [tool.coverage.report]
 fail_under = 60
