@@ -1,5 +1,5 @@
 [tool.coverage.run]
-omit = ["tests/*", "qe_metrics/cli.py"]
+omit = ["tests/*", "qe_metrics/cli.py", "qe_metrics/utils/entrypoint.py"]
 
 [tool.coverage.report]
 fail_under = 60
@@ -45,6 +45,7 @@ pyaml-env = "^1.2.1"
 ipdb = "^0.13.13"
 pyhelper-utils = "^0.0.10"
 flask = "^3.0.3"
+requests = "^2.31.0"
 sqlalchemy = "^2.0.29"
 
 [tool.poetry.group.dev.dependencies]
