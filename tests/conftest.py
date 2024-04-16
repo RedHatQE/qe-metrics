@@ -38,14 +38,14 @@ def tmp_products_file(tmp_path, request):
 
 
 @pytest.fixture
-def product(tmp_sqlite_db, request):
+def product(request, tmp_sqlite_db):
     product = ProductsEntity(name=request.param)
     tmp_sqlite_db.session.add(instance=product)
     return product
 
 
 @pytest.fixture
-def jira_issues(tmp_sqlite_db, product, request):
+def jira_issues(request, tmp_sqlite_db, product):
     jira_issues = []
     for issue in request.param:
         jira_issue = JiraIssuesEntity(product=product, **issue)
