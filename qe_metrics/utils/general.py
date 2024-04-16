@@ -47,12 +47,9 @@ def verify_queries(queries_dict: dict[str, str]) -> None:
     if len(missing_queries) == len(required_queries):
         raise ValueError(f"All queries are missing in the products file: {' '.join(missing_queries)}")
     elif missing_queries:
-        LOGGER.warn(f"Some queries is missing in the products file: {' '.join(missing_queries)}")
+        LOGGER.warning(f"Some queries are missing in the products file: {' '.join(missing_queries)}")
 
-    if missing_queries := [query for query in required_queries if query not in queries_dict]:
-        raise ValueError(f"Missing queries in the products file: {' '.join(missing_queries)}")
-
-    if none_values_queries := [query for query in required_queries if queries_dict.get(query) is None]:
+    if none_values_queries := [query for query in queries_dict if queries_dict.get(query) is None]:
         raise ValueError(f"The following queries have None values: {' '.join(none_values_queries)}")
 
     if extra_queries := [query for query in queries_dict if query not in required_queries]:
