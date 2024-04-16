@@ -42,6 +42,13 @@ def verify_queries(queries_dict: dict[str, str]) -> None:
     """
     required_queries = ["blocker", "critical-blocker"]
 
+    missing_queries = [query for query in required_queries if query not in queries_dict]
+
+    if len(missing_queries) == len(required_queries):
+        raise ValueError(f"All queries are missing in the products file: {' '.join(missing_queries)}")
+    elif missing_queries:
+        LOGGER.warn(f"Some queries is missing in the products file: {' '.join(missing_queries)}")
+
     if missing_queries := [query for query in required_queries if query not in queries_dict]:
         raise ValueError(f"Missing queries in the products file: {' '.join(missing_queries)}")
 

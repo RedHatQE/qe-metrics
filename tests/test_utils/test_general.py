@@ -19,7 +19,7 @@ def valid_queries():
 
 @pytest.fixture
 def queries_missing_value():
-    return {"blocker": "query"}
+    return {}
 
 
 @pytest.fixture
