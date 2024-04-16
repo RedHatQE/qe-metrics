@@ -58,7 +58,7 @@ def update_existing_issue(
 
     Args:
         existing_issue (JiraIssuesEntity): Existing issue from the database
-        issue (Issue): New issue from Jira
+        new_issue_data (Issue): New issue from Jira
         severity (str): Severity assigned to the issue/query
         db_session (Session): SQLAlchemy Session instance.
     """
