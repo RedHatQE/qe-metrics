@@ -35,7 +35,6 @@ def products_from_repository() -> Dict[str, Dict[str, str]]:
 
 
 def get_products_dict(products_file: str | None = None, products_file_url: bool = False) -> Dict[str, Dict[str, str]]:
-    products_from_repository()
     if products_file:
         products = parse_config(path=products_file)
 
