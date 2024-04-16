@@ -9,11 +9,11 @@ skip_empty = true
 directory = ".tests_coverage"
 
 [tool.mypy]
-check_untyped_defs = "true"
-disallow_any_generics = "true"
-disallow_incomplete_defs = "true"
-disallow_untyped_defs = "true"
-no_implicit_optional = "true"
+check_untyped_defs = true
+disallow_any_generics = true
+disallow_incomplete_defs = true
+disallow_untyped_defs = true
+no_implicit_optional = true
 
 [tool.poetry]
 name = "qe-metrics"
@@ -35,18 +35,17 @@ Download = "https://github.com/RedHatQE/qe-metrics"
 "Bug Tracker" = "https://github.com/RedHatQE/qe-metrics/issues"
 
 [tool.poetry.dependencies]
-# 3.12 to be added following completion of https://github.com/ponyorm/pony/issues/703
-python = ">=3.8,<3.12"
+python = "^3.8"
 click = "^8.1.7"
 jira = "^3.5.2"
 jinja2 = "^3.1.2"
 python-simple-logger = "^1.0.8"
 psycopg2-binary = "^2.9.9"
-pony = "^0.7.17"
 pyaml-env = "^1.2.1"
 ipdb = "^0.13.13"
 pyhelper-utils = "^0.0.10"
 flask = "^3.0.3"
+sqlalchemy = "^2.0.29"
 
 [tool.poetry.group.dev.dependencies]
 tox = "^4.11.4"

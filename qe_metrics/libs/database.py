@@ -1,68 +1,46 @@
-import os
-from types import TracebackType
-from typing import Optional, Type
+from typing import Any, Dict
 
-
-from pony import orm
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session
 from pyaml_env import parse_config
 from simple_logger.logger import get_logger
+from urllib.parse import quote_plus
 
 from qe_metrics.utils.general import verify_config
-from qe_metrics.libs.database_mapping import DB_OBJECT
-
-
-LOGGER = get_logger(name="Database")
+from qe_metrics.libs.database_mapping import Base
 
 
 class Database:
     def __init__(self, config_file: str, verbose: bool) -> None:
+        self.logger = get_logger(name=__name__)
+        self.connection_string = self.connection_string_builder(db_config=parse_config(path=config_file)["database"])
+        self.verbose = verbose
+        self.engine = create_engine(url=self.connection_string, echo=self.verbose)
+        Base.metadata.create_all(bind=self.engine)
+
+    def session(self) -> Session:
+        return Session(bind=self.engine)
+
+    @staticmethod
+    def connection_string_builder(db_config: Dict[Any, Any]) -> str:
         """
-        Initialize the Database class
+        Create a sqlalchemy connection string using values from db_config.
+
+        Documentation for connections strings can be found at https://docs.sqlalchemy.org/en/20/core/engines.html
 
         Args:
-            config_file (str): Path to the yaml file holding database and Jira configuration.
-            verbose (bool): Verbose output of database connection and transactions.
+            db_config (Dict[Any, Any]): A dictionary containing database connection information.
+        Returns:
+            str: A sqlalchemy connection string.
         """
-        self.logger = get_logger(name=self.__class__.__module__)
-        orm.set_sql_debug(debug=verbose)
-        self.config_file = config_file
-        self.db_config = parse_config(path=self.config_file)["database"]
-
-    def __enter__(self) -> "Database":
-        self.bind_local_db_connection() if self.db_config.get("local") else self.bind_remote_db_connection()
-        DB_OBJECT.generate_mapping(create_tables=True)
-        self.logger.success("Connected to the database")
-        return self
-
-    def __exit__(
-        self,
-        exc_type: Optional[Type[BaseException]],
-        exc_value: Optional[BaseException],
-        traceback: Optional[TracebackType],
-    ) -> None:
-        if DB_OBJECT:
-            DB_OBJECT.disconnect()
-            self.logger.success("Disconnected from the database")
-
-    def bind_local_db_connection(self) -> None:
-        """
-        Bind a local database connection using SQLite.
-        """
-        sqlite_filepath = self.db_config.get("local_filepath", "/tmp/qe_metrics.sqlite")
-        self.logger.info(f"Local database connection enabled, using SQLite database at {sqlite_filepath}")
-        DB_OBJECT.bind(provider="sqlite", filename=sqlite_filepath, create_db=not os.path.exists(sqlite_filepath))
-
-    def bind_remote_db_connection(self) -> None:
-        """
-        Bind a remote database connection.
-        """
-        self.logger.info("Remote database connection enabled, connecting to database")
-        verify_config(config=self.db_config, required_keys=["host", "user", "password", "database"])
-        DB_OBJECT.bind(
-            host=self.db_config["host"],
-            user=self.db_config["user"],
-            password=self.db_config["password"],
-            database=self.db_config["database"],
-            port=self.db_config.get("port", 5432),
-            provider=self.db_config.get("provider", "postgres"),
-        )
+        if db_config["local"]:
+            return f"sqlite:///{db_config.get('local_filepath', '/tmp/qe_metrics.sqlite')}"
+        else:
+            verify_config(config=db_config, required_keys=["host", "user", "password", "database"])
+            driver_name = db_config.get("provider", "postgresql")
+            username = db_config["user"]
+            password = quote_plus(string=db_config["password"])
+            host = db_config["host"]
+            port = db_config.get("port", 5432)
+            database = db_config["database"]
+            return f"{driver_name}://{username}:{password}@{host}:{port}/{database}"

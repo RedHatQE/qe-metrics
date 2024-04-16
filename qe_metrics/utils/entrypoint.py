@@ -1,7 +1,6 @@
 from __future__ import annotations
 from typing import Dict, List
 
-from pony import orm
 
 from pyaml_env import parse_config
 from simple_logger.logger import get_logger
@@ -25,10 +24,11 @@ def qe_metrics(
     slack_config: Dict[str, str] = config.get("slack", {})
     slack_webhook_url: str = slack_config.get("webhook_url", "")
     slack_webhook_error_url: str = slack_config.get("webhook_error_url", "")
-
+    db = Database(config_file=config_file, verbose=verbose_db)
     _products_dict = get_products_dict(products_file=products_file, products_file_url=products_file_url)
-    with Database(config_file=config_file, verbose=verbose_db), Jira(config_file=config_file) as jira, orm.db_session:
-        for product_dict in process_products(products_dict=_products_dict):
+
+    with db.session() as db_session, Jira(config_file=config_file) as jira:
+        for product_dict in process_products(products_dict=_products_dict, db_session=db_session):
             product, queries = product_dict.values()
             for severity, query in queries.items():
                 LOGGER.info(f'Executing Jira query for "{product.name}" with severity "{severity}"')
@@ -39,13 +39,14 @@ def qe_metrics(
                             product=product,
                             severity=severity,
                             jira_server=jira.jira_config["server"],
+                            db_session=db_session,
                         )
                 except Exception as ex:
                     err_msg = f'Failed to update issues for "{product.name}" with severity "{severity}": {ex}'
                     LOGGER.error(err_msg)
                     errors_for_slack.append(err_msg)
 
-        if not delete_old_issues(days_old=data_retention_days):
+        if not delete_old_issues(days_old=data_retention_days, db_session=db_session):
             errors_for_slack.append("Failed to delete old issues")
 
         if errors_for_slack and slack_webhook_error_url:

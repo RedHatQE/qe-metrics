@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 import pytest
 from qe_metrics.libs.database_mapping import JiraIssuesEntity
 from qe_metrics.utils.issue_utils import (
@@ -26,16 +26,21 @@ from qe_metrics.utils.issue_utils import (
                     "status": "To Do",
                     "issue_type": "bug",
                     "customer_escaped": True,
-                    "date_created": "2023-12-29",
-                    "last_updated": "2023-12-30",
+                    "date_created": datetime.strptime("2023-12-29", "%Y-%m-%d").date(),
+                    "last_updated": datetime.strptime("2023-12-30", "%Y-%m-%d").date(),
                 }
             ],
         ),
     ],
     indirect=True,
 )
-def test_update_existing_issue(product, raw_jira_issues, jira_issues):
-    update_existing_issue(existing_issue=jira_issues[0], new_issue_data=raw_jira_issues[0], severity="critical")
+def test_update_existing_issue(raw_jira_issues, jira_issues, db_session):
+    update_existing_issue(
+        existing_issue=jira_issues[0],
+        new_issue_data=raw_jira_issues[0],
+        severity="critical",
+        db_session=db_session,
+    )
     expected_values = {
         "title": "New Test Summary",
         "severity": "critical",
@@ -78,8 +83,8 @@ def test_update_existing_issue(product, raw_jira_issues, jira_issues):
                     "status": "In Progress",
                     "issue_type": "bug",
                     "customer_escaped": False,
-                    "date_created": "2024-12-30",
-                    "last_updated": "2024-12-31",
+                    "date_created": datetime.strptime("2024-12-30", "%Y-%m-%d").date(),
+                    "last_updated": datetime.strptime("2024-12-31", "%Y-%m-%d").date(),
                 },
                 {
                     "issue_key": "TEST-1135",
@@ -90,18 +95,19 @@ def test_update_existing_issue(product, raw_jira_issues, jira_issues):
                     "status": "In Progress",
                     "issue_type": "bug",
                     "customer_escaped": False,
-                    "date_created": "2024-12-30",
-                    "last_updated": "2024-12-31",
+                    "date_created": datetime.strptime("2024-12-30", "%Y-%m-%d").date(),
+                    "last_updated": datetime.strptime("2024-12-31", "%Y-%m-%d").date(),
                 },
             ],
         ),
     ],
     indirect=True,
 )
-def test_mark_obsolete_issues(product, raw_jira_issues, jira_issues):
-    mark_obsolete_issues(current_issues=raw_jira_issues, db_issues=jira_issues, product=product)
+def test_mark_obsolete_issues(product, raw_jira_issues, jira_issues, db_session):
+    mark_obsolete_issues(current_issues=raw_jira_issues, db_issues=jira_issues, product=product, db_session=db_session)
     assert (
-        JiraIssuesEntity.get(lambda issue: issue.issue_key == "TEST-1135").status == "obsolete"
+        db_session.query(JiraIssuesEntity).filter(JiraIssuesEntity.issue_key == "TEST-1135").first().status
+        == "obsolete"
     ), f"Issue {jira_issues[1].issue_key} was not marked as obsolete."
 
 
@@ -121,10 +127,18 @@ def test_mark_obsolete_issues(product, raw_jira_issues, jira_issues):
     ],
     indirect=True,
 )
-def test_create_update_issues_creates_issues(product, raw_jira_issues):
-    create_update_issues(issues=raw_jira_issues, product=product, severity="blocker", jira_server="https://jira.com")
-    assert JiraIssuesEntity.get(
-        issue_key=raw_jira_issues[0].key, product=product
+def test_create_update_issues_creates_issues(product, raw_jira_issues, db_session):
+    create_update_issues(
+        issues=raw_jira_issues,
+        product=product,
+        severity="blocker",
+        jira_server="https://jira.com",
+        db_session=db_session,
+    )
+    assert (
+        db_session.query(JiraIssuesEntity)
+        .filter(JiraIssuesEntity.issue_key == raw_jira_issues[0].key, JiraIssuesEntity.product == product)
+        .first()
     ), f"New issue {raw_jira_issues[0].key} was not created."
 
 
@@ -143,18 +157,18 @@ def test_create_update_issues_creates_issues(product, raw_jira_issues):
                     "status": "Open",
                     "issue_type": "bug",
                     "customer_escaped": False,
-                    "date_created": "2023-01-01",
-                    "last_updated": "2023-01-01",
+                    "date_created": datetime.strptime("2023-01-01", "%Y-%m-%d").date(),
+                    "last_updated": datetime.strptime("2023-01-01", "%Y-%m-%d").date(),
                 }
             ],
         ),
     ],
     indirect=True,
 )
-def test_delete_old_issues(product, jira_issues):
-    delete_old_issues(days_old=180)
-    assert not JiraIssuesEntity.get(
-        issue_key="OLD-1234", product=product
+def test_delete_old_issues(product, jira_issues, db_session):
+    delete_old_issues(days_old=180, db_session=db_session)
+    assert (
+        not db_session.query(JiraIssuesEntity).filter(JiraIssuesEntity.issue_key == jira_issues[0].issue_key).first()
     ), f"Old issue {jira_issues[0].issue_key} was not deleted."
 
 
