@@ -19,7 +19,12 @@ def valid_queries():
 
 @pytest.fixture
 def queries_missing_value():
-    return {"blocker": "query"}
+    return {}
+
+
+@pytest.fixture
+def queries_one_missing_value():
+    return {"blocker": "query1"}
 
 
 @pytest.fixture
@@ -51,6 +56,10 @@ def test_verify_config_with_none_values_raises_value_error(config_none_value):
 
 def test_verify_queries_with_all_required_queries_present(valid_queries):
     verify_queries(queries_dict=valid_queries)
+
+
+def test_verify_queries_with_one_required_query_missing(queries_one_missing_value):
+    verify_queries(queries_dict=queries_one_missing_value)
 
 
 def test_verify_queries_with_missing_queries_raises_value_error(queries_missing_value):
