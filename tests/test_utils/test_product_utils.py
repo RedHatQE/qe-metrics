@@ -8,11 +8,10 @@ from qe_metrics.utils.product_utils import get_products_dict, process_products, 
     [{"test-from-file-product": {"blocker": "BLOCKER QUERY", "critical-blocker": "CRITICAL BLOCKER QUERY"}}],
     indirect=True,
 )
-def test_products_from_file(db_session, tmp_products_file):
-    process_products(products_dict=get_products_dict(products_file=tmp_products_file))
-    all_products = ProductsEntity.select()
+def test_products_from_file(tmp_products_file, db_session):
+    process_products(products_dict=get_products_dict(products_file=tmp_products_file), db_session=db_session)
     assert "test-from-file-product" in [
-        _product.name for _product in all_products
+        _product.name for _product in db_session.query(ProductsEntity).all()
     ], "Test product test-from-file-product not found in database."
 
 

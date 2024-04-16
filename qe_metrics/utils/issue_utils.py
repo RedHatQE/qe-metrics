@@ -1,10 +1,10 @@
 from datetime import datetime, date, timedelta
-from pony import orm
 from pyhelper_utils.general import ignore_exceptions
 from typing import List
 from jira import Issue
 from qe_metrics.libs.database_mapping import ProductsEntity, JiraIssuesEntity
 from simple_logger.logger import get_logger
+from sqlalchemy.orm import Session
 
 LOGGER = get_logger(name=__name__)
 
@@ -28,6 +28,7 @@ def mark_obsolete_issues(
     current_issues: List[Issue],
     db_issues: List["JiraIssuesEntity"],
     product: "ProductsEntity",  # type: ignore  # noqa: F821
+    db_session: Session,
 ) -> None:
     """
     Mark JiraIssuesEntity items as "obsolete" in the database that are not in the current list of issues.
@@ -36,6 +37,7 @@ def mark_obsolete_issues(
         current_issues (List[Issue]): A list of current Jira issues for a product.
         db_issues ("JiraIssuesEntity"): A list of JiraIssuesEntity objects already in the database.
         product ("ProductsEntity"): The product object to which the issues belong.
+        db_session (Session): SQLAlchemy Session instance.
     """
     current_issue_keys = {issue.key for issue in current_issues}
     db_issue_keys = {db_issue.issue_key for db_issue in db_issues if db_issue.product.name == product.name}
@@ -45,17 +47,20 @@ def mark_obsolete_issues(
         if db_issue.issue_key in closed_issue_keys and db_issue.status != OBSOLETE_STR:
             LOGGER.info(f'Marking issue "{db_issue.issue_key}" for product {product.name} as {OBSOLETE_STR}')
             db_issue.status = OBSOLETE_STR
-    orm.commit()
+    db_session.commit()
 
 
-def update_existing_issue(existing_issue: JiraIssuesEntity, new_issue_data: Issue, severity: str) -> None:
+def update_existing_issue(
+    existing_issue: JiraIssuesEntity, new_issue_data: Issue, severity: str, db_session: Session
+) -> None:
     """
     Check if any of the fields of an existing issue have changed and update them if they have.
 
     Args:
         existing_issue (JiraIssuesEntity): Existing issue from the database
-        issue (Issue): New issue from Jira
+        new_issue_data (Issue): New issue from Jira
         severity (str): Severity assigned to the issue/query
+        db_session (Session): SQLAlchemy Session instance.
     """
     fields = [
         ("title", new_issue_data.fields.summary.strip()),
@@ -71,63 +76,73 @@ def update_existing_issue(existing_issue: JiraIssuesEntity, new_issue_data: Issu
                 f'Updating issue "{new_issue_data.key}" in database: "{field}" changed from "{current_value}" to "{new_value}"'
             )
             setattr(existing_issue, field, new_value)
-    orm.commit()
+    db_session.commit()
 
 
 def create_update_issues(
-    issues: List[Issue],
-    product: "ProductsEntity",
-    severity: str,
-    jira_server: str,
+    issues: List[Issue], product: "ProductsEntity", severity: str, jira_server: str, db_session: Session
 ) -> None:
     """
-    Create or update JiraIssuesEntity items in the database from a list of Jira issues. Sets status of obselete issues as "obselete".
+    Create or update JiraIssuesEntity items in the database from a list of Jira issues. Sets status of obsolete issues as "obsolete".
 
     Args:
         issues (List[Issue]): A list of Jira issues
         product (ProductsEntity): A product object
         severity (str): Severity of the issues
         jira_server (str): Jira server URL
+        db_session (Session): SQLAlchemy Session instance.
 
     Returns:
         List["JiraIssuesEntity"]: A list of JiraIssuesEntity objects
     """
     for issue in issues:
-        if existing_issue := JiraIssuesEntity.get(issue_key=issue.key, product=product):
-            update_existing_issue(existing_issue=existing_issue, new_issue_data=issue, severity=severity)
+        if existing_issue := db_session.query(JiraIssuesEntity).filter_by(issue_key=issue.key, product=product).first():
+            update_existing_issue(
+                existing_issue=existing_issue, new_issue_data=issue, severity=severity, db_session=db_session
+            )
         else:
-            JiraIssuesEntity(
-                product=product,
-                issue_key=issue.key,
-                title=issue.fields.summary,
-                url=f"{jira_server}/browse/{issue.key}",
-                project=issue.fields.project.key,
-                severity=severity,
-                status=issue.fields.status.name,
-                issue_type=issue.fields.issuetype.name.lower(),
-                customer_escaped=issue.is_customer_escaped,
-                date_created=format_issue_date(issue.fields.created),
-                last_updated=format_issue_date(issue.fields.updated),
+            db_session.add(
+                instance=JiraIssuesEntity(
+                    product_id=product.id,
+                    issue_key=issue.key,
+                    title=issue.fields.summary,
+                    url=f"{jira_server}/browse/{issue.key}",
+                    project=issue.fields.project.key,
+                    severity=severity,
+                    status=issue.fields.status.name,
+                    issue_type=issue.fields.issuetype.name.lower(),
+                    customer_escaped=issue.is_customer_escaped,
+                    date_created=format_issue_date(issue.fields.created),
+                    last_updated=format_issue_date(issue.fields.updated),
+                )
             )
 
     mark_obsolete_issues(
-        current_issues=issues, db_issues=JiraIssuesEntity.select(product=product, severity=severity), product=product
+        current_issues=issues,
+        db_issues=db_session.query(JiraIssuesEntity).filter(
+            JiraIssuesEntity.product == product, JiraIssuesEntity.severity == severity
+        ),
+        product=product,
+        db_session=db_session,
     )
-    orm.commit()
+    db_session.commit()
 
 
 @ignore_exceptions(logger=LOGGER, return_on_error=False)
-def delete_old_issues(days_old: int) -> bool:
+def delete_old_issues(days_old: int, db_session: Session) -> bool:
     """
     Delete issues from the database that were last updated more than the number of days defined in days_old.
 
     Args:
         days_old (int): Number of days from the last_updated date to keep issues in the database
+        db_session (Session): SQLAlchemy Session instance.
     """
-    issues = JiraIssuesEntity.select(
-        lambda _issue: _issue.last_updated < (datetime.now().date() - timedelta(days=days_old))
+    issues = (
+        db_session.query(JiraIssuesEntity)
+        .filter(JiraIssuesEntity.last_updated < (datetime.now().date() - timedelta(days=days_old)))
+        .all()
     )
     LOGGER.info(f"Deleting {len(issues)} issues that haven't been updated in {days_old} days from the database")
-    [issue.delete() for issue in issues]
-    orm.commit()
+    [db_session.delete(issue) for issue in issues]
+    db_session.commit()
     return True
