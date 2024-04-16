@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import Any, Dict, List
 
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import yaml
 from qe_metrics.libs.database_mapping import ProductsEntity
 from pyaml_env import parse_config
@@ -12,23 +13,50 @@ import requests
 LOGGER = get_logger(name=__name__)
 
 
+def fetch_config_file_content_from_url(base_url: str, file_name: str) -> requests.Response:
+    return requests.get(f"{base_url}/configs/{file_name}")
+
+
 def products_from_repository() -> Dict[str, Dict[str, str]]:
-    res = requests.get("https://raw.githubusercontent.com/RedHatQE/qe-metrics-products-config/main/product-config.yaml")
-    return yaml.safe_load(res.content.decode("utf-8"))
+    config_dict: Dict[str, Dict[str, str]] = {}
+    base_url = "https://raw.githubusercontent.com/RedHatQE/qe-metrics-products-config/main"
+    product_config_file_url = f"{base_url}/product-config.yaml"
+    res = requests.get(product_config_file_url)
+    if not res.ok:
+        LOGGER.error(f"Failed to fetch products file {product_config_file_url} from repository: {res.status_code}")
+        return config_dict
+
+    config_files_content = res.content.decode("utf-8")
+    config_files_dict = yaml.safe_load(config_files_content)
+    config_files_list: List[str] = config_files_dict.get("configs")
+    if not config_files_list:
+        LOGGER.error(f"{product_config_file_url} does not contain any config files")
+        return config_dict
+
+    futures = []
+    with ThreadPoolExecutor() as executor:
+        for config_file_name in config_files_list:
+            futures.append(executor.submit(fetch_config_file_content_from_url, base_url, config_file_name))
+
+    for result in as_completed(futures):
+        if not result.result().ok:
+            LOGGER.error(f"Failed to fetch config file {result.result().url}: {result.result().status_code}")
+            continue
+
+        config_dict.update(yaml.safe_load(result.result().content.decode("utf-8")))
+
+    return config_dict
 
 
 def get_products_dict(products_file: str | None = None, products_file_url: bool = False) -> Dict[str, Dict[str, str]]:
     if products_file:
-        products = parse_config(path=products_file)
+        return parse_config(path=products_file)
 
     elif products_file_url:
-        products = products_from_repository()
+        return products_from_repository()
 
-    else:
-        LOGGER.error("Either products_file or products_file_url must be set")
-        return {}
-
-    return products
+    LOGGER.error("Either products_file or products_file_url must be set")
+    return {}
 
 
 def process_products(products_dict: Dict[str, Dict[str, str]], db_session: Session) -> List[Dict[Any, Any]]:

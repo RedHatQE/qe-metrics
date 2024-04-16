@@ -1,6 +1,7 @@
 import os
 import time
 from multiprocessing import Process
+from typing import Any, Dict
 
 import click
 
@@ -77,9 +78,19 @@ def update_qe_metrics() -> str:
 
 
 if __name__ == "__main__":
+    # To not run `qe_metrics` in `while loop` (for debugging) set QE_METRICS_LOCAL_DEBUG=1
+    qe_metrics_kwargs: Dict[str, Any] = {
+        "config_file": os.environ.get("QE_METRICS_CONFIG", "config.yaml"),
+        "verbose_db": run_in_verbose(),
+    }
+    if os.environ.get("QE_METRICS_LOCAL_DEBUG"):
+        qe_metrics_kwargs["products_file_url"] = True
+        qe_metrics(**qe_metrics_kwargs)
+        exit(0)
+
     proc = Process(
         target=run_in_while,
-        kwargs={"config_file": os.environ.get("QE_METRICS_CONFIG", "config.yaml"), "verbose_db": run_in_verbose()},
+        kwargs=qe_metrics_kwargs,
     )
     proc.start()
 

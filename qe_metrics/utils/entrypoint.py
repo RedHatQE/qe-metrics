@@ -28,7 +28,13 @@ def qe_metrics(
     _products_dict = get_products_dict(products_file=products_file, products_file_url=products_file_url)
 
     with db.session() as db_session, Jira(config_file=config_file) as jira:
-        for product_dict in process_products(products_dict=_products_dict, db_session=db_session):
+        _proccess_products = process_products(products_dict=_products_dict, db_session=db_session)
+
+        if not _proccess_products:
+            LOGGER.error("No products found in config file")
+            return
+
+        for product_dict in _proccess_products:
             product, queries = product_dict.values()
             for severity, query in queries.items():
                 LOGGER.info(f'Executing Jira query for "{product.name}" with severity "{severity}"')
