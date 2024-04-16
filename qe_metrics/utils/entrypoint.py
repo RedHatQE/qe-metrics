@@ -27,8 +27,14 @@ def qe_metrics(
     slack_webhook_error_url: str = slack_config.get("webhook_error_url", "")
 
     _products_dict = get_products_dict(products_file=products_file, products_file_url=products_file_url)
+    _proccess_products = process_products(products_dict=_products_dict)
+
+    if not _proccess_products:
+        LOGGER.error("No products found in config file")
+        return
+
     with Database(config_file=config_file, verbose=verbose_db), Jira(config_file=config_file) as jira, orm.db_session:
-        for product_dict in process_products(products_dict=_products_dict):
+        for product_dict in _proccess_products:
             product, queries = product_dict.values()
             for severity, query in queries.items():
                 LOGGER.info(f'Executing Jira query for "{product.name}" with severity "{severity}"')
