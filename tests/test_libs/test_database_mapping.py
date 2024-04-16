@@ -27,9 +27,9 @@ from qe_metrics.libs.database_mapping import JiraIssuesEntity, ProductsEntity
     ],
     indirect=True,
 )
-def test_database_jira_issues_entry(jira_issues, tmp_sqlite_db):
+def test_database_jira_issues_entry(jira_issues, db_session):
     assert jira_issues[0].issue_key in [
-        _issue.issue_key for _issue in tmp_sqlite_db.session.query(JiraIssuesEntity).all()
+        _issue.issue_key for _issue in db_session.query(JiraIssuesEntity).all()
     ], f"Test Jira issue {jira_issues[0].issue_key} not found in database."
 
 
@@ -38,7 +38,7 @@ def test_database_jira_issues_entry(jira_issues, tmp_sqlite_db):
     [("test-product-entry-product")],
     indirect=True,
 )
-def test_database_products_entry(product, tmp_sqlite_db):
+def test_database_products_entry(product, db_session):
     assert product.name in [
-        _product.name for _product in tmp_sqlite_db.session.query(ProductsEntity).all()
+        _product.name for _product in db_session.query(ProductsEntity).all()
     ], f"Test product {product.name} not found in database."

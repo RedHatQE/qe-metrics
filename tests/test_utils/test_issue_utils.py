@@ -34,12 +34,12 @@ from qe_metrics.utils.issue_utils import (
     ],
     indirect=True,
 )
-def test_update_existing_issue(raw_jira_issues, jira_issues, tmp_sqlite_db):
+def test_update_existing_issue(raw_jira_issues, jira_issues, db_session):
     update_existing_issue(
         existing_issue=jira_issues[0],
         new_issue_data=raw_jira_issues[0],
         severity="critical",
-        db_session=tmp_sqlite_db.session,
+        db_session=db_session,
     )
     expected_values = {
         "title": "New Test Summary",
@@ -103,12 +103,10 @@ def test_update_existing_issue(raw_jira_issues, jira_issues, tmp_sqlite_db):
     ],
     indirect=True,
 )
-def test_mark_obsolete_issues(product, raw_jira_issues, jira_issues, tmp_sqlite_db):
-    mark_obsolete_issues(
-        current_issues=raw_jira_issues, db_issues=jira_issues, product=product, db_session=tmp_sqlite_db.session
-    )
+def test_mark_obsolete_issues(product, raw_jira_issues, jira_issues, db_session):
+    mark_obsolete_issues(current_issues=raw_jira_issues, db_issues=jira_issues, product=product, db_session=db_session)
     assert (
-        tmp_sqlite_db.session.query(JiraIssuesEntity).filter(JiraIssuesEntity.issue_key == "TEST-1135").first().status
+        db_session.query(JiraIssuesEntity).filter(JiraIssuesEntity.issue_key == "TEST-1135").first().status
         == "obsolete"
     ), f"Issue {jira_issues[1].issue_key} was not marked as obsolete."
 
@@ -129,16 +127,16 @@ def test_mark_obsolete_issues(product, raw_jira_issues, jira_issues, tmp_sqlite_
     ],
     indirect=True,
 )
-def test_create_update_issues_creates_issues(product, raw_jira_issues, tmp_sqlite_db):
+def test_create_update_issues_creates_issues(product, raw_jira_issues, db_session):
     create_update_issues(
         issues=raw_jira_issues,
         product=product,
         severity="blocker",
         jira_server="https://jira.com",
-        db_session=tmp_sqlite_db.session,
+        db_session=db_session,
     )
     assert (
-        tmp_sqlite_db.session.query(JiraIssuesEntity)
+        db_session.query(JiraIssuesEntity)
         .filter(JiraIssuesEntity.issue_key == raw_jira_issues[0].key, JiraIssuesEntity.product == product)
         .first()
     ), f"New issue {raw_jira_issues[0].key} was not created."
@@ -167,12 +165,10 @@ def test_create_update_issues_creates_issues(product, raw_jira_issues, tmp_sqlit
     ],
     indirect=True,
 )
-def test_delete_old_issues(product, jira_issues, tmp_sqlite_db):
-    delete_old_issues(days_old=180, db_session=tmp_sqlite_db.session)
+def test_delete_old_issues(product, jira_issues, db_session):
+    delete_old_issues(days_old=180, db_session=db_session)
     assert (
-        not tmp_sqlite_db.session.query(JiraIssuesEntity)
-        .filter(JiraIssuesEntity.issue_key == jira_issues[0].issue_key)
-        .first()
+        not db_session.query(JiraIssuesEntity).filter(JiraIssuesEntity.issue_key == jira_issues[0].issue_key).first()
     ), f"Old issue {jira_issues[0].issue_key} was not deleted."
 
 
