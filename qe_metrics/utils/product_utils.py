@@ -19,7 +19,7 @@ def fetch_file_from_url(base_url: str, file_name: str) -> requests.Response:
 
 def products_from_repository() -> Dict[str, Dict[str, str]]:
     config_dict: Dict[str, Dict[str, str]] = {}
-    base_url = "https://raw.githubusercontent.com/RedHatQE/qe-metrics-products-config/split-configs"
+    base_url = "https://raw.githubusercontent.com/RedHatQE/qe-metrics-products-config/main"
     config_files_content = requests.get(f"{base_url}/product-config.yaml").content.decode("utf-8")
     config_files = yaml.safe_load(config_files_content)
 
