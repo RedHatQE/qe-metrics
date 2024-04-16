@@ -47,6 +47,7 @@ pyaml-env = "^1.2.1"
 ipdb = "^0.13.13"
 pyhelper-utils = "^0.0.9"
 flask = "^3.0.3"
+requests = "^2.31.0"
 
 [tool.poetry.group.dev.dependencies]
 tox = "^4.11.4"

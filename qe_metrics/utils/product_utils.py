@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import Any, Dict, List
 
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import yaml
 from qe_metrics.libs.database_mapping import ProductsEntity
 from pyaml_env import parse_config
@@ -9,16 +10,32 @@ from qe_metrics.utils.general import verify_queries
 from simple_logger.logger import get_logger
 import requests
 
-
 LOGGER = get_logger(name=__name__)
 
 
+def fetch_file_from_url(base_url: str, file_name: str) -> requests.Response:
+    return requests.get(f"{base_url}/configs/{file_name}")
+
+
 def products_from_repository() -> Dict[str, Dict[str, str]]:
-    res = requests.get("https://raw.githubusercontent.com/RedHatQE/qe-metrics-products-config/main/product-config.yaml")
-    return yaml.safe_load(res.content.decode("utf-8"))
+    config_dict: Dict[str, Dict[str, str]] = {}
+    base_url = "https://raw.githubusercontent.com/RedHatQE/qe-metrics-products-config/split-configs"
+    config_files_content = requests.get(f"{base_url}/product-config.yaml").content.decode("utf-8")
+    config_files = yaml.safe_load(config_files_content)
+
+    futures = []
+    with ThreadPoolExecutor() as executor:
+        for config_file_name in config_files["configs"]:
+            futures.append(executor.submit(fetch_file_from_url, base_url, config_file_name))
+
+    for result in as_completed(futures):
+        config_dict.update(yaml.safe_load(result.result().content.decode("utf-8")))
+
+    return config_dict
 
 
 def get_products_dict(products_file: str | None = None, products_file_url: bool = False) -> Dict[str, Dict[str, str]]:
+    products_from_repository()
     if products_file:
         products = parse_config(path=products_file)
 
