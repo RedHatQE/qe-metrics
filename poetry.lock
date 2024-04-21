@@ -74,17 +74,6 @@ files = [
 ]
 
 [[package]]
-name = "cfgv"
-version = "3.4.0"
-description = "Validate configuration and produce human readable error messages."
-optional = false
-python-versions = ">=3.8"
-files = [
-    {file = "cfgv-3.4.0-py2.py3-none-any.whl", hash = "sha256:b7265b1f29fd3316bfcd2b330d63d024f2bfd8bcb8b0272f8e19a504856c48f9"},
-    {file = "cfgv-3.4.0.tar.gz", hash = "sha256:e52591d4c5f5dead8e0f673fb16db7949d2cfb3f7da4582893288f0ded8fe560"},
-]
-
-[[package]]
 name = "chardet"
 version = "5.2.0"
 description = "Universal encoding detector for Python 3"
@@ -475,20 +464,6 @@ docs = ["Sphinx", "furo"]
 test = ["objgraph", "psutil"]
 
 [[package]]
-name = "identify"
-version = "2.5.35"
-description = "File identification library for Python"
-optional = false
-python-versions = ">=3.8"
-files = [
-    {file = "identify-2.5.35-py2.py3-none-any.whl", hash = "sha256:c4de0081837b211594f8e877a6b4fad7ca32bbfc1a9307fdd61c28bfe923f13e"},
-    {file = "identify-2.5.35.tar.gz", hash = "sha256:10a7ca245cfcd756a554a7288159f72ff105ad233c7c4b9c6f0f4d108f5f6791"},
-]
-
-[package.extras]
-license = ["ukkonen"]
-
-[[package]]
 name = "idna"
 version = "3.7"
 description = "Internationalized Domain Names in Applications (IDNA)"
@@ -777,20 +752,6 @@ files = [
 ]
 
 [[package]]
-name = "nodeenv"
-version = "1.8.0"
-description = "Node.js virtual environment builder"
-optional = false
-python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*"
-files = [
-    {file = "nodeenv-1.8.0-py2.py3-none-any.whl", hash = "sha256:df865724bb3c3adc86b3876fa209771517b0cfe596beff01a92700e0e8be4cec"},
-    {file = "nodeenv-1.8.0.tar.gz", hash = "sha256:d51e0c37e64fbf47d017feac3145cdbb58836d7eee8c6f6d3b6880c5456227d2"},
-]
-
-[package.dependencies]
-setuptools = "*"
-
-[[package]]
 name = "oauthlib"
 version = "3.2.2"
 description = "A generic, spec-compliant, thorough implementation of the OAuth request-signing logic"
@@ -972,24 +933,6 @@ files = [
 [package.extras]
 dev = ["pre-commit", "tox"]
 testing = ["pytest", "pytest-benchmark"]
-
-[[package]]
-name = "pre-commit"
-version = "3.5.0"
-description = "A framework for managing and maintaining multi-language pre-commit hooks."
-optional = false
-python-versions = ">=3.8"
-files = [
-    {file = "pre_commit-3.5.0-py2.py3-none-any.whl", hash = "sha256:841dc9aef25daba9a0238cd27984041fa0467b4199fc4852e27950664919f660"},
-    {file = "pre_commit-3.5.0.tar.gz", hash = "sha256:5804465c675b659b0862f07907f96295d490822a450c4c40e747d0b1c6ebcb32"},
-]
-
-[package.dependencies]
-cfgv = ">=2.0.0"
-identify = ">=1.0.0"
-nodeenv = ">=0.11.1"
-pyyaml = ">=5.1"
-virtualenv = ">=20.10.0"
 
 [[package]]
 name = "prompt-toolkit"
@@ -1381,22 +1324,6 @@ typing-extensions = {version = ">=4.0.0,<5.0", markers = "python_version < \"3.9
 jupyter = ["ipywidgets (>=7.5.1,<9)"]
 
 [[package]]
-name = "setuptools"
-version = "69.5.1"
-description = "Easily download, build, install, upgrade, and uninstall Python packages"
-optional = false
-python-versions = ">=3.8"
-files = [
-    {file = "setuptools-69.5.1-py3-none-any.whl", hash = "sha256:c636ac361bc47580504644275c9ad802c50415c7522212252c033bd15f301f32"},
-    {file = "setuptools-69.5.1.tar.gz", hash = "sha256:6c1fccdac05a97e598fb0ae3bbed5904ccb317337a51139dcd51453611bbb987"},
-]
-
-[package.extras]
-docs = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "pygments-github-lexers (==0.0.5)", "rst.linker (>=1.9)", "sphinx (>=3.5)", "sphinx-favicon", "sphinx-inline-tabs", "sphinx-lint", "sphinx-notfound-page (>=1,<2)", "sphinx-reredirects", "sphinxcontrib-towncrier"]
-testing = ["build[virtualenv]", "filelock (>=3.4.0)", "importlib-metadata", "ini2toml[lite] (>=0.9)", "jaraco.develop (>=7.21)", "jaraco.envs (>=2.2)", "jaraco.path (>=3.2.0)", "mypy (==1.9)", "packaging (>=23.2)", "pip (>=19.1)", "pytest (>=6,!=8.1.1)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=2.2)", "pytest-home (>=0.5)", "pytest-mypy", "pytest-perf", "pytest-ruff (>=0.2.1)", "pytest-timeout", "pytest-xdist (>=3)", "tomli", "tomli-w (>=1.0.0)", "virtualenv (>=13.0.0)", "wheel"]
-testing-integration = ["build[virtualenv] (>=1.0.3)", "filelock (>=3.4.0)", "jaraco.envs (>=2.2)", "jaraco.path (>=3.2.0)", "packaging (>=23.2)", "pytest", "pytest-enabler", "pytest-xdist", "tomli", "virtualenv (>=13.0.0)", "wheel"]
-
-[[package]]
 name = "six"
 version = "1.16.0"
 description = "Python 2 and 3 compatibility utilities"
@@ -1660,4 +1587,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "3ee7ac4b588f42e6d7cee665652c58b70385fac2989b420fc9fe4f629a253e5a"
+content-hash = "01cff1bcb54f32c2bace970b53eaca0fd8895ded0168092c57db892751f0b64e"
