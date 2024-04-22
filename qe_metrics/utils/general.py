@@ -1,5 +1,5 @@
 import os
-from typing import Any
+from typing import Any, Dict, List
 
 
 from simple_logger.logger import get_logger
@@ -8,7 +8,7 @@ from simple_logger.logger import get_logger
 LOGGER = get_logger(name="general")
 
 
-def verify_config(config: dict[str, Any], required_keys: list[str]) -> None:
+def verify_config(config: Dict[str, Any], required_keys: List[str]) -> None:
     """
     Verify that the required keys are present and the required keys values are not None in the config dictionary.
 
@@ -26,7 +26,7 @@ def verify_config(config: dict[str, Any], required_keys: list[str]) -> None:
         raise ValueError(f"The following keys have None values: {' '.join(none_values_keys)}")
 
 
-def verify_queries(queries_dict: dict[str, str]) -> None:
+def verify_queries(queries_dict: Dict[str, str]) -> None:
     """
     Verify that the required queries are present.
 

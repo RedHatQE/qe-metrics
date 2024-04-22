@@ -1,0 +1,47 @@
+{
+  "npm": {
+    "publish": false
+  },
+  "git": {
+    "requireCleanWorkingDir": true,
+    "requireBranch": false,
+    "requireUpstream": true,
+    "requireCommits": false,
+    "addUntrackedFiles": false,
+    "commit": true,
+    "commitMessage": "Release ${version}",
+    "commitArgs": [],
+    "tag": true,
+    "tagName": null,
+    "tagMatch": null,
+    "tagAnnotation": "Release ${version}",
+    "tagArgs": [],
+    "push": true,
+    "pushArgs": [
+      "--follow-tags"
+    ],
+    "pushRepo": "",
+    "changelog": "git log --no-merges --pretty=format:\"* %s (%h) by %an on %as\" ${from}...${to}"
+  },
+  "github": {
+    "release": true,
+    "releaseName": "Release ${version}",
+    "releaseNotes": null,
+    "autoGenerate": false,
+    "preRelease": false,
+    "draft": false,
+    "tokenRef": "GITHUB_TOKEN",
+    "assets": null,
+    "host": null,
+    "timeout": 0,
+    "proxy": null,
+    "skipChecks": false,
+    "web": false
+  },
+  "plugins": {
+    "@release-it/bumper": {
+      "in": "VERSION",
+      "out": "VERSION"
+    }
+  }
+}

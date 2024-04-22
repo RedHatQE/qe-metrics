@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, List
 
 import click
 from jira import JIRA, Issue
@@ -54,7 +54,7 @@ class Jira:
             self.logger.error(f'Failed to connect to Jira server {self.jira_config["server"]}: {error}')
             raise click.Abort()
 
-    def search(self, query: str) -> list[Any]:
+    def search(self, query: str) -> List[Any]:
         """
         Performs a Jira JQL query using the Jira connection and returns a list of issues, including all fields.
 
