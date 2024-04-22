@@ -15,6 +15,15 @@ disallow_incomplete_defs = true
 disallow_untyped_defs = true
 no_implicit_optional = true
 
+[tool.ruff]
+preview = true
+line-length = 120
+fix = true
+output-format = "grouped"
+
+[tool.ruff.format]
+exclude = [".git", ".venv", ".mypy_cache", ".tox", "__pycache__"]
+
 [tool.poetry]
 name = "qe-metrics"
 version = "1.0.0"
@@ -50,7 +59,6 @@ sqlalchemy = "^2.0.29"
 
 [tool.poetry.group.dev.dependencies]
 tox = "^4.11.4"
-pre-commit = "*"
 pytest = "^8.0.0"
 pytest-cov = "^5.0.0"
 pytest-mock = "^3.12.0"
@@ -59,15 +67,13 @@ ipython = "*"
 [tool.poetry.scripts]
 qe-metrics = "qe_metrics.cli:cli_entrypoint"
 
+[tool.poetry-dynamic-versioning]
+enable = true
+pattern = "((?P<epoch>\\d+)!)?(?P<base>\\d+(\\.\\d+)*)"
+
+[tool.poetry-dynamic-versioning.substitution]
+files = ["VERSION"]
+
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.ruff]
-preview = true
-line-length = 120
-fix = true
-output-format = "grouped"
-
-[tool.ruff.format]
-exclude = [".git", ".venv", ".mypy_cache", ".tox", "__pycache__"]
+requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning"]
+build-backend = "poetry_dynamic_versioning.backend"
