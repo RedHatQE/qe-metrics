@@ -1,14 +1,10 @@
-FROM docker.io/library/python:3.11-slim
-
-COPY pyproject.toml poetry.lock /qe-metrics/
-COPY qe_metrics /qe-metrics/qe_metrics
-
-WORKDIR /qe-metrics
+FROM docker.io/library/python:3.12-slim
 
 ENV POETRY_HOME=/qe-metrics
 
-RUN apt update \
-    && apt install -y --no-install-recommends vim nano
+COPY pyproject.toml poetry.lock /qe-metrics/
+COPY qe_metrics /qe-metrics/qe_metrics
+WORKDIR /qe-metrics
 
 RUN python3 -m pip install pip poetry --upgrade \
     && poetry config cache-dir /qe-metrics \
