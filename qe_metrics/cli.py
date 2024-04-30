@@ -77,6 +77,11 @@ def update_qe_metrics() -> str:
     return "OK"
 
 
+@APP.route("/healthcheck")
+def healthcheck() -> str:
+    return "alive"
+
+
 if __name__ == "__main__":
     # To not run `qe_metrics` in `while loop` (for debugging) set QE_METRICS_LOCAL_DEBUG=1
     qe_metrics_kwargs: Dict[str, Any] = {
