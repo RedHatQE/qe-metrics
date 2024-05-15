@@ -2,14 +2,15 @@ from typing import Any, List
 
 import click
 from jira import JIRA, Issue
-from jira.exceptions import JIRAError
 from pyaml_env import parse_config
+from pyhelper_utils.general import ignore_exceptions
 from simple_logger.logger import get_logger
 from qe_metrics.utils.general import verify_config
 
 JIRA_CUSTOM_FIELD_MAPPING = {
     "customer_escaped": "customfield_12313440",
 }
+LOGGER = get_logger(name=__name__)
 
 
 class Jira:
@@ -20,7 +21,6 @@ class Jira:
         Args:
             config_file (str): Path to the yaml file holding database and Jira configuration.
         """
-        self.logger = get_logger(name=self.__class__.__module__)
         self.jira_config = parse_config(path=config_file)["jira"]
 
     def __enter__(self) -> "Jira":
@@ -35,8 +35,9 @@ class Jira:
     ) -> None:
         if self.connection:
             self.connection.close()
-            self.logger.success("Disconnected from Jira")
+            LOGGER.success("Disconnected from Jira")
 
+    @ignore_exceptions(retry=3, retry_interval=1, raise_final_exception=True, logger=LOGGER)
     def connect(self) -> JIRA:
         """
         Connect to Jira
@@ -48,12 +49,13 @@ class Jira:
         try:
             connection = JIRA(server=self.jira_config["server"], token_auth=self.jira_config["token"])
             connection.my_permissions()
-            self.logger.success(f'Successfully authenticated to Jira server {self.jira_config["server"]}')
+            LOGGER.success(f'Successfully authenticated to Jira server {self.jira_config["server"]}')
             return connection
-        except JIRAError as error:
-            self.logger.error(f'Failed to connect to Jira server {self.jira_config["server"]}: {error}')
+        except Exception as error:
+            LOGGER.error(f'Failed to connect to Jira server {self.jira_config["server"]}: {error}')
             raise click.Abort()
 
+    @ignore_exceptions(retry=3, retry_interval=1, raise_final_exception=True, logger=LOGGER)
     def search(self, query: str) -> List[Any]:
         """
         Performs a Jira JQL query using the Jira connection and returns a list of issues, including all fields.
@@ -69,8 +71,8 @@ class Jira:
             for issue in issues:
                 issue.is_customer_escaped = self.is_customer_escaped(issue=issue)
             return issues
-        except JIRAError as error:
-            self.logger.error(f'Failed to execute Jira query "{query}": {error}')
+        except Exception as error:
+            LOGGER.error(f'Failed to execute Jira query "{query}": {error}')
             raise click.Abort()
 
     @staticmethod
