@@ -140,11 +140,15 @@ def delete_old_issues(days_old: int, db_session: Session) -> bool:
         days_old (int): Number of days from the last_updated date to keep issues in the database
         db_session (Session): SQLAlchemy Session instance.
     """
-    issues = db_session.execute(
-        select(JiraIssuesEntity).where(
-            JiraIssuesEntity.last_updated < (datetime.now().date() - timedelta(days=days_old))
+    issues = (
+        db_session.execute(
+            select(JiraIssuesEntity).where(
+                JiraIssuesEntity.last_updated < (datetime.now().date() - timedelta(days=days_old))
+            )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
     LOGGER.info(f"Deleting {len(issues)} issues that haven't been updated in {days_old} days from the database")
     [db_session.delete(issue) for issue in issues]
     db_session.commit()
