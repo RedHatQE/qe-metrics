@@ -5,6 +5,7 @@ from jira import Issue
 from qe_metrics.libs.database_mapping import ProductsEntity, JiraIssuesEntity
 from simple_logger.logger import get_logger
 from sqlalchemy.orm import Session
+from sqlalchemy import select
 
 LOGGER = get_logger(name=__name__)
 
@@ -96,7 +97,9 @@ def create_update_issues(
         List["JiraIssuesEntity"]: A list of JiraIssuesEntity objects
     """
     for issue in issues:
-        if existing_issue := db_session.query(JiraIssuesEntity).filter_by(issue_key=issue.key, product=product).first():
+        if existing_issue := db_session.execute(
+            select(JiraIssuesEntity).where(JiraIssuesEntity.issue_key == issue.key)
+        ).scalar_one_or_none():
             update_existing_issue(
                 existing_issue=existing_issue, new_issue_data=issue, severity=severity, db_session=db_session
             )
@@ -119,9 +122,9 @@ def create_update_issues(
 
     mark_obsolete_issues(
         current_issues=issues,
-        db_issues=db_session.query(JiraIssuesEntity).filter(
-            JiraIssuesEntity.product == product, JiraIssuesEntity.severity == severity
-        ),
+        db_issues=db_session.execute(
+            select(JiraIssuesEntity).where(JiraIssuesEntity.product == product, JiraIssuesEntity.severity == severity)
+        ).scalars(),
         product=product,
         db_session=db_session,
     )
@@ -138,8 +141,12 @@ def delete_old_issues(days_old: int, db_session: Session) -> bool:
         db_session (Session): SQLAlchemy Session instance.
     """
     issues = (
-        db_session.query(JiraIssuesEntity)
-        .filter(JiraIssuesEntity.last_updated < (datetime.now().date() - timedelta(days=days_old)))
+        db_session.execute(
+            select(JiraIssuesEntity).where(
+                JiraIssuesEntity.last_updated < (datetime.now().date() - timedelta(days=days_old))
+            )
+        )
+        .scalars()
         .all()
     )
     LOGGER.info(f"Deleting {len(issues)} issues that haven't been updated in {days_old} days from the database")
