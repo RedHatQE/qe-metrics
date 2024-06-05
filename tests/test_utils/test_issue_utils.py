@@ -1,6 +1,7 @@
 from datetime import date, datetime
 import pytest
 from qe_metrics.libs.database_mapping import JiraIssuesEntity
+from sqlalchemy import select
 from qe_metrics.utils.issue_utils import (
     update_existing_issue,
     mark_obsolete_issues,
@@ -106,7 +107,9 @@ def test_update_existing_issue(raw_jira_issues, jira_issues, db_session):
 def test_mark_obsolete_issues(product, raw_jira_issues, jira_issues, db_session):
     mark_obsolete_issues(current_issues=raw_jira_issues, db_issues=jira_issues, product=product, db_session=db_session)
     assert (
-        db_session.query(JiraIssuesEntity).filter(JiraIssuesEntity.issue_key == "TEST-1135").first().status
+        db_session.execute(select(JiraIssuesEntity).filter(JiraIssuesEntity.issue_key == "TEST-1135"))
+        .scalar_one()
+        .status
         == "obsolete"
     ), f"Issue {jira_issues[1].issue_key} was not marked as obsolete."
 
@@ -135,11 +138,9 @@ def test_create_update_issues_creates_issues(product, raw_jira_issues, db_sessio
         jira_server="https://jira.com",
         db_session=db_session,
     )
-    assert (
-        db_session.query(JiraIssuesEntity)
-        .filter(JiraIssuesEntity.issue_key == raw_jira_issues[0].key, JiraIssuesEntity.product == product)
-        .first()
-    ), f"New issue {raw_jira_issues[0].key} was not created."
+    assert db_session.execute(
+        select(JiraIssuesEntity).filter(JiraIssuesEntity.issue_key == raw_jira_issues[0].key)
+    ).scalar_one_or_none(), f"New issue {raw_jira_issues[0].key} was not created."
 
 
 @pytest.mark.parametrize(
@@ -167,9 +168,9 @@ def test_create_update_issues_creates_issues(product, raw_jira_issues, db_sessio
 )
 def test_delete_old_issues(product, jira_issues, db_session):
     delete_old_issues(days_old=180, db_session=db_session)
-    assert (
-        not db_session.query(JiraIssuesEntity).filter(JiraIssuesEntity.issue_key == jira_issues[0].issue_key).first()
-    ), f"Old issue {jira_issues[0].issue_key} was not deleted."
+    assert not db_session.execute(
+        select(JiraIssuesEntity).filter(JiraIssuesEntity.issue_key == jira_issues[0].issue_key)
+    ).scalar_one_or_none(), f"Old issue {jira_issues[0].issue_key} was not deleted."
 
 
 @pytest.mark.parametrize(

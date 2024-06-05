@@ -1,6 +1,6 @@
 import pytest
 from datetime import datetime
-
+from sqlalchemy import select
 from qe_metrics.libs.database_mapping import JiraIssuesEntity, ProductsEntity
 
 
@@ -29,7 +29,7 @@ from qe_metrics.libs.database_mapping import JiraIssuesEntity, ProductsEntity
 )
 def test_database_jira_issues_entry(jira_issues, db_session):
     assert jira_issues[0].issue_key in [
-        _issue.issue_key for _issue in db_session.query(JiraIssuesEntity).all()
+        _issue.issue_key for _issue in db_session.execute(select(JiraIssuesEntity)).scalars()
     ], f"Test Jira issue {jira_issues[0].issue_key} not found in database."
 
 
@@ -40,5 +40,5 @@ def test_database_jira_issues_entry(jira_issues, db_session):
 )
 def test_database_products_entry(product, db_session):
     assert product.name in [
-        _product.name for _product in db_session.query(ProductsEntity).all()
+        _product.name for _product in db_session.execute(select(ProductsEntity)).scalars()
     ], f"Test product {product.name} not found in database."
