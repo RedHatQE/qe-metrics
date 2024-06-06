@@ -8,7 +8,7 @@ from pyaml_env import parse_config
 from qe_metrics.utils.general import verify_queries
 from simple_logger.logger import get_logger
 from sqlalchemy.orm import Session
-from sqlalchemy import select
+from sqlalchemy import select, insert
 import requests
 
 LOGGER = get_logger(name=__name__)
@@ -79,7 +79,7 @@ def process_products(products_dict: Dict[str, Dict[str, str]], db_session: Sessi
             product = db_session.execute(select(ProductsEntity).where(ProductsEntity.name == name)).scalar_one_or_none()
             if product is None:
                 product = ProductsEntity(name=name)
-                db_session.add(instance=product)
+                db_session.execute(statement=insert(ProductsEntity).values(name=name))
             products.append({"product": product, "queries": queries})
         except ValueError as err:
             LOGGER.error(f"Error occurred parsing queries for product {name}: {err}")
