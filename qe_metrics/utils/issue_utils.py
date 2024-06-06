@@ -5,7 +5,7 @@ from jira import Issue
 from qe_metrics.libs.database_mapping import ProductsEntity, JiraIssuesEntity
 from simple_logger.logger import get_logger
 from sqlalchemy.orm import Session
-from sqlalchemy import select
+from sqlalchemy import select, insert, delete
 
 LOGGER = get_logger(name=__name__)
 
@@ -104,8 +104,8 @@ def create_update_issues(
                 existing_issue=existing_issue, new_issue_data=issue, severity=severity, db_session=db_session
             )
         else:
-            db_session.add(
-                instance=JiraIssuesEntity(
+            db_session.execute(
+                statement=insert(JiraIssuesEntity).values(
                     product_id=product.id,
                     issue_key=issue.key,
                     title=issue.fields.summary,
@@ -140,16 +140,12 @@ def delete_old_issues(days_old: int, db_session: Session) -> bool:
         days_old (int): Number of days from the last_updated date to keep issues in the database
         db_session (Session): SQLAlchemy Session instance.
     """
-    issues = (
-        db_session.execute(
-            select(JiraIssuesEntity).where(
-                JiraIssuesEntity.last_updated < (datetime.now().date() - timedelta(days=days_old))
-            )
+
+    LOGGER.info(f"Deleting issues that haven't been updated in {days_old} days from the database")
+    db_session.execute(
+        statement=delete(JiraIssuesEntity).where(
+            JiraIssuesEntity.last_updated < (datetime.now().date() - timedelta(days=days_old))
         )
-        .scalars()
-        .all()
     )
-    LOGGER.info(f"Deleting {len(issues)} issues that haven't been updated in {days_old} days from the database")
-    [db_session.delete(issue) for issue in issues]
     db_session.commit()
     return True

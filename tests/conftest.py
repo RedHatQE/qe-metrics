@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 import pytest
 import yaml
 from sqlalchemy.orm import Session
+from sqlalchemy import insert
 from qe_metrics.libs.database import Database
 from qe_metrics.libs.database_mapping import ProductsEntity, JiraIssuesEntity
 
@@ -40,19 +41,15 @@ def tmp_products_file(tmp_path, request):
 
 @pytest.fixture
 def product(request, db_session):
-    product = ProductsEntity(name=request.param)
-    db_session.add(instance=product)
-    return product
+    return db_session.execute(
+        statement=insert(ProductsEntity).values(name=request.param).returning(ProductsEntity)
+    ).scalar_one()
 
 
 @pytest.fixture
 def jira_issues(request, db_session, product):
-    jira_issues = []
-    for issue in request.param:
-        jira_issue = JiraIssuesEntity(product=product, **issue)
-        jira_issues.append(jira_issue)
-    db_session.add_all(instances=jira_issues)
-    yield jira_issues
+    issues_data = [dict(product_id=product.id, **issue) for issue in request.param]
+    yield db_session.scalars(insert(JiraIssuesEntity).values(issues_data).returning(JiraIssuesEntity)).all()
 
 
 @pytest.fixture
