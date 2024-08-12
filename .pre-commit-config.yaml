@@ -53,5 +53,5 @@ repos:
     hooks:
       - id: mypy
         exclude: ^(tests/)
-        additional_dependencies: [types-all]
+        additional_dependencies: [types-PyYAML, types-requests]
         args: [--ignore-missing-imports, --disallow-untyped-defs]
