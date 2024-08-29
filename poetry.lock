@@ -1304,12 +1304,12 @@ windows-terminal = ["colorama (>=0.4.6)"]
 
 [[package]]
 name = "pyhelper-utils"
-version = "0.0.37"
+version = "0.0.38"
 description = "Collective utility functions for python projects"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "pyhelper_utils-0.0.37.tar.gz", hash = "sha256:b5585dbcf7ab779435b218ce2b14c02e69d6d4256bc53adac8297120a550c0b5"},
+    {file = "pyhelper_utils-0.0.38.tar.gz", hash = "sha256:43f4ec39168ed2ed9c9e19a636f21e1e80a51055610f4ba8d72cde8feb00d8d0"},
 ]
 
 [package.dependencies]
@@ -1439,12 +1439,12 @@ six = "*"
 
 [[package]]
 name = "python-simple-logger"
-version = "1.0.36"
+version = "1.0.37"
 description = "A simple logger for python"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "python_simple_logger-1.0.36.tar.gz", hash = "sha256:7187af94507e48e8460ce625dbb80fc30e07357ec774fc5378a90fa241a35971"},
+    {file = "python_simple_logger-1.0.37.tar.gz", hash = "sha256:e20056fb4372fab8ec78a57a690c28660ea448a89dc2b43aecf0bc454579c0ce"},
 ]
 
 [package.dependencies]
@@ -1846,4 +1846,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "e0548c149041586d24a6eeea930a3101f651692dd47655e4f778b64573e5c803"
+content-hash = "9dd9ad1cf6c918e3f6c3b9d553287e293b993bb1df5e404c7058d8a2dcf4661e"
