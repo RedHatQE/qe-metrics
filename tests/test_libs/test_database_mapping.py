@@ -39,6 +39,6 @@ def test_database_jira_issues_entry(jira_issues, db_session):
     indirect=True,
 )
 def test_database_products_entry(product, db_session):
-    assert product.name in [
-        _product.name for _product in db_session.execute(select(ProductsEntity)).scalars()
-    ], f"Test product {product.name} not found in database."
+    assert product.name in [_product.name for _product in db_session.execute(select(ProductsEntity)).scalars()], (
+        f"Test product {product.name} not found in database."
+    )
