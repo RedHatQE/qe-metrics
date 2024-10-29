@@ -49,10 +49,10 @@ class Jira:
         try:
             connection = JIRA(server=self.jira_config["server"], token_auth=self.jira_config["token"])
             connection.my_permissions()
-            LOGGER.success(f'Successfully authenticated to Jira server {self.jira_config["server"]}')
+            LOGGER.success(f"Successfully authenticated to Jira server {self.jira_config['server']}")
             return connection
         except Exception as error:
-            LOGGER.error(f'Failed to connect to Jira server {self.jira_config["server"]}: {error}')
+            LOGGER.error(f"Failed to connect to Jira server {self.jira_config['server']}: {error}")
             raise click.Abort()
 
     @ignore_exceptions(retry=3, retry_interval=1, raise_final_exception=True, logger=LOGGER)

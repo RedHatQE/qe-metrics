@@ -187,6 +187,6 @@ def test_delete_old_issues(product, jira_issues, db_session):
     indirect=True,
 )
 def test_format_issue_date(raw_jira_issues):
-    assert format_issue_date(raw_jira_issues[0].fields.updated) == date(
-        2023, 1, 31
-    ), "Issue date not formatted properly."
+    assert format_issue_date(raw_jira_issues[0].fields.updated) == date(2023, 1, 31), (
+        "Issue date not formatted properly."
+    )
