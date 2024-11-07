@@ -1327,18 +1327,18 @@ windows-terminal = ["colorama (>=0.4.6)"]
 
 [[package]]
 name = "pyhelper-utils"
-version = "0.0.44"
+version = "1.0.1"
 description = "Collective utility functions for python projects"
 optional = false
-python-versions = "<4.0,>=3.8"
+python-versions = "<4.0,>=3.9"
 files = [
-    {file = "pyhelper_utils-0.0.44.tar.gz", hash = "sha256:de21bc9de7eea02bc4e1b85686e18eb49dde3d7f41b45f1cfc498df0e47abc17"},
+    {file = "pyhelper_utils-1.0.1.tar.gz", hash = "sha256:beae9c5deaa0e4cbca757c7b5371d08ec5a5fd1af20a8b9dfb9acfbdb9cf0b04"},
 ]
 
 [package.dependencies]
 ipdb = ">=0.13.13,<0.14.0"
 python-rrmngmnt = ">=0.1.32,<0.2.0"
-python-simple-logger = ">=1.0.19,<2.0.0"
+python-simple-logger = ">=2.0.0,<3.0.0"
 requests = ">=2.31.0,<3.0.0"
 rich = ">=13.7.1,<14.0.0"
 
@@ -1462,12 +1462,12 @@ six = "*"
 
 [[package]]
 name = "python-simple-logger"
-version = "1.0.42"
+version = "2.0.0"
 description = "A simple logger for python"
 optional = false
-python-versions = "<4.0,>=3.8"
+python-versions = "<4.0,>=3.9"
 files = [
-    {file = "python_simple_logger-1.0.42.tar.gz", hash = "sha256:ad8ffd2019bcf824377d4ac2ac295b29210de0572ac85b45a8e250acf9ca0053"},
+    {file = "python_simple_logger-2.0.0.tar.gz", hash = "sha256:ec8345cde347d026ccd9480cff49fe20df9be8a23b08151883058efc0438f585"},
 ]
 
 [package.dependencies]
@@ -1846,13 +1846,13 @@ files = [
 
 [[package]]
 name = "werkzeug"
-version = "3.1.1"
+version = "3.1.2"
 description = "The comprehensive WSGI web application library."
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "werkzeug-3.1.1-py3-none-any.whl", hash = "sha256:a71124d1ef06008baafa3d266c02f56e1836a5984afd6dd6c9230669d60d9fb5"},
-    {file = "werkzeug-3.1.1.tar.gz", hash = "sha256:8cd39dfbdfc1e051965f156163e2974e52c210f130810e9ad36858f0fd3edad4"},
+    {file = "werkzeug-3.1.2-py3-none-any.whl", hash = "sha256:4f7d1a5de312c810a8a2c6f0b47e9f6a7cffb7c8322def35e4d4d9841ff85597"},
+    {file = "werkzeug-3.1.2.tar.gz", hash = "sha256:f471a4cd167233077e9d2a8190c3471c5bc520c636a9e3c1e9300c33bced03bc"},
 ]
 
 [package.dependencies]
@@ -1883,4 +1883,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "b10fe0022eda8cb6be00301eac5089fd5723f37c91e08c55fba2c46803b726ce"
+content-hash = "8355135d522d70e67bb538f109e41e5423a2bffe550cd4eae28f162ffb14396f"
