@@ -1286,13 +1286,13 @@ tests = ["pytest"]
 
 [[package]]
 name = "pyaml-env"
-version = "1.2.1"
+version = "1.2.2"
 description = "Provides yaml file parsing with environment variable resolution"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "pyaml_env-1.2.1-py3-none-any.whl", hash = "sha256:2e7da2d4bba0629711ade1a41864e5e200c84ded896a3d27e9f560fae7311c36"},
-    {file = "pyaml_env-1.2.1.tar.gz", hash = "sha256:6d5dc98c8c82df743a132c196e79963050c9feb05b0a6f25f3ad77771d3d95b0"},
+    {file = "pyaml_env-1.2.2-py3-none-any.whl", hash = "sha256:1c1c852a805a3ac9f9b57ef995520fdeea1c1a7a1edda6471cdf1b7c2ebb13c9"},
+    {file = "pyaml_env-1.2.2.tar.gz", hash = "sha256:f83502516b6f1561ba7c2db9ced939a7a9933a66702d8071e98ad07da49a4bb4"},
 ]
 
 [package.dependencies]
