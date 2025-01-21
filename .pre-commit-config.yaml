@@ -25,7 +25,7 @@ repos:
             "flake8-mutable",
           ]
   - repo: https://github.com/DavidAnson/markdownlint-cli2
-    rev: v0.17.1
+    rev: v0.17.2
     hooks:
       - id: markdownlint-cli2
   - repo: https://github.com/Yelp/detect-secrets
@@ -33,13 +33,13 @@ repos:
     hooks:
       - id: detect-secrets
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.9.1
+    rev: v0.9.2
     hooks:
       - id: ruff
       - id: ruff-format
 
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.23.0
+    rev: v8.23.1
     hooks:
       - id: gitleaks
 
