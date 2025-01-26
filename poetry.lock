@@ -1328,20 +1328,20 @@ windows-terminal = ["colorama (>=0.4.6)"]
 
 [[package]]
 name = "pyhelper-utils"
-version = "1.0.5"
+version = "1.0.7"
 description = "Collective utility functions for python projects"
 optional = false
-python-versions = "<4.0,>=3.9"
+python-versions = "~=3.9"
 files = [
-    {file = "pyhelper_utils-1.0.5.tar.gz", hash = "sha256:f2b2ae669bac81491d563e1eb8e67e6a0d479241cfe86da91d677b201336c576"},
+    {file = "pyhelper_utils-1.0.7.tar.gz", hash = "sha256:559b1fd567d5a6f99ee67f4e963d22acde50d3357ca9c48b471f1f9467e70c7b"},
 ]
 
 [package.dependencies]
-ipdb = ">=0.13.13,<0.14.0"
-python-rrmngmnt = ">=0.1.32,<0.2.0"
-python-simple-logger = ">=2.0.0,<3.0.0"
-requests = ">=2.31.0,<3.0.0"
-rich = ">=13.7.1,<14.0.0"
+ipdb = ">=0.13.13,<0.14"
+python-rrmngmnt = ">=0.1.32,<0.2"
+python-simple-logger = ">=2.0.0,<3"
+requests = ">=2.31.0,<3"
+rich = ">=13.7.1,<14"
 
 [[package]]
 name = "pynacl"
@@ -1463,16 +1463,16 @@ six = "*"
 
 [[package]]
 name = "python-simple-logger"
-version = "2.0.3"
+version = "2.0.4"
 description = "A simple logger for python"
 optional = false
-python-versions = "<4.0,>=3.9"
+python-versions = "~=3.9"
 files = [
-    {file = "python_simple_logger-2.0.3.tar.gz", hash = "sha256:8bc1b66ef567dd700945c7103287e5284dd1941d117c6d66f6a66a63b214d7da"},
+    {file = "python_simple_logger-2.0.4.tar.gz", hash = "sha256:9ace48532dd9ded3a7e10e2d95f46eed2e48ce7cea4ca40c55d098aa8d4ddca3"},
 ]
 
 [package.dependencies]
-colorlog = ">=6.7.0,<7.0.0"
+colorlog = ">=6.7.0,<7"
 
 [[package]]
 name = "pyyaml"
