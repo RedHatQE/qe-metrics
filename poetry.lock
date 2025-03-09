@@ -1328,12 +1328,12 @@ windows-terminal = ["colorama (>=0.4.6)"]
 
 [[package]]
 name = "pyhelper-utils"
-version = "1.0.11"
+version = "1.0.12"
 description = "Collective utility functions for python projects"
 optional = false
 python-versions = "~=3.9"
 files = [
-    {file = "pyhelper_utils-1.0.11.tar.gz", hash = "sha256:53d461490821ba73d54946be6b79f2fc4ff1eaa3b4218b0afbde77aa78b44c74"},
+    {file = "pyhelper_utils-1.0.12.tar.gz", hash = "sha256:6a68c09f04c44c6757c84b1a8b0a5b6ce8c41b2e8cfafedebb33e6e19893a0a6"},
 ]
 
 [package.dependencies]
@@ -1463,12 +1463,12 @@ six = "*"
 
 [[package]]
 name = "python-simple-logger"
-version = "2.0.7"
+version = "2.0.8"
 description = "A simple logger for python"
 optional = false
 python-versions = "~=3.9"
 files = [
-    {file = "python_simple_logger-2.0.7.tar.gz", hash = "sha256:aae25a76ebd40e8a0bf96bcd001e5ae52190bc7bb467f1c549df3a65ceabaee8"},
+    {file = "python_simple_logger-2.0.8.tar.gz", hash = "sha256:64178d2eaa7e50354b2bc0fb3e36347d24f790156e10f19595e26abfd055631d"},
 ]
 
 [package.dependencies]
