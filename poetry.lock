@@ -1463,16 +1463,20 @@ six = "*"
 
 [[package]]
 name = "python-simple-logger"
-version = "2.0.11"
+version = "2.0.12"
 description = "A simple logger for python"
 optional = false
 python-versions = "~=3.9"
 files = [
-    {file = "python_simple_logger-2.0.11.tar.gz", hash = "sha256:db6588e5bbd162513346f2bbbd2836259ce24d3b02351fa346ff5990c99958d5"},
+    {file = "python_simple_logger-2.0.12.tar.gz", hash = "sha256:6311940638bad71c6b80f0591aaf3b36a7c9110056eab3544709c2ee676ffdb9"},
 ]
 
 [package.dependencies]
 colorlog = ">=6.7.0,<7"
+
+[package.extras]
+dev = ["ipdb (>=0.13.13)", "ipython (>=8.18.1)"]
+tests = ["pytest (>=8.3.5)", "pytest-cov (>=6.1.1)"]
 
 [[package]]
 name = "pyyaml"
