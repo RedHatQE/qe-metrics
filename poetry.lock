@@ -1466,12 +1466,12 @@ six = "*"
 
 [[package]]
 name = "python-simple-logger"
-version = "2.0.15"
+version = "2.0.16"
 description = "A simple logger for python"
 optional = false
-python-versions = "~=3.9"
+python-versions = ">=3.9"
 files = [
-    {file = "python_simple_logger-2.0.15.tar.gz", hash = "sha256:0a8d355e0e91c363e649fe37bda2fad9d5d13dde18c029a7a030c97e796a9ca9"},
+    {file = "python_simple_logger-2.0.16.tar.gz", hash = "sha256:1e89f01568dab7ad16732b2fd3f0fd1fe9cefc05e0073abcef305b1efa5533a7"},
 ]
 
 [package.dependencies]
@@ -1783,13 +1783,13 @@ files = [
 
 [[package]]
 name = "tox"
-version = "4.28.3"
+version = "4.28.4"
 description = "tox is a generic virtualenv management and test command line tool"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "tox-4.28.3-py3-none-any.whl", hash = "sha256:1debe9daf0b7e64d425ef99a17292b0792385686b1d541df34c7298211e99269"},
-    {file = "tox-4.28.3.tar.gz", hash = "sha256:b91db7219e5242002cf4040a299c8852026d6af35fcd21274d456fb62dafee7b"},
+    {file = "tox-4.28.4-py3-none-any.whl", hash = "sha256:8d4ad9ee916ebbb59272bb045e154a10fa12e3bbdcf94cc5185cbdaf9b241f99"},
+    {file = "tox-4.28.4.tar.gz", hash = "sha256:b5b14c6307bd8994ff1eba5074275826620325ee1a4f61316959d562bfd70b9d"},
 ]
 
 [package.dependencies]
