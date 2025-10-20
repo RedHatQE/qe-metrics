@@ -1,4 +1,4 @@
-FROM docker.io/library/python:3.12-slim
+FROM docker.io/library/python:3.14-slim
 
 ENV POETRY_HOME=/qe-metrics
 
